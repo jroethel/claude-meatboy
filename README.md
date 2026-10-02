@@ -5,7 +5,7 @@ by JR is Tall ([github.com/jroethel](https://github.com/jroethel)&nbsp;&nbsp;x: 
 
 Global Leaderboard at [meatboy-scores.jroethel.workers.dev](https://meatboy-scores.jroethel.workers.dev)
 
-<img src="header.svg" width="100%" alt="A tall programmer, the title CLAUDE MEATBOY in block letters, and Clawd as Meat Boy beside Bandage Girl">
+<img src="header.svg" width="100%" alt="A tall programmer, the title SUPER MEAT BOY in block letters with CLAWD painted over MEAT in dripping blood, and Clawd as Meat Boy beside Bandage Girl">
 
 A whimsical tribute to [Super Meat Boy](https://store.steampowered.com/app/40800/Super_Meat_Boy/) inside Claude Code, starring Clawd (the mascot) as Meat Boy.
 

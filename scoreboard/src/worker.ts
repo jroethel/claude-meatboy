@@ -40,11 +40,11 @@ function page(rows: Row[]): string {
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Claude Meatboy: global leaderboard</title><link rel="icon" href="${ICON}"><style>
 body{margin:0;min-height:100vh;background:linear-gradient(#1b1030,#b4553a);color:#f3e9dc;font:16px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;display:flex;justify-content:center}
-main{padding:48px 20px;width:min(520px,100%);box-sizing:border-box}h1{color:#d77757;font-size:28px;margin:0 0 4px}
+main{padding:48px 20px;width:min(520px,100%);box-sizing:border-box}h1{color:#d77757;font-size:28px;margin:0 0 16px}h1 img{display:block;width:100%;height:auto;border-radius:6px}
 .sub{margin:0 0 28px;opacity:.85}table{border-collapse:collapse;width:100%}td{padding:6px 10px;border-bottom:1px solid #f3e9dc33}
 td:nth-child(3),td:nth-child(4){text-align:right;white-space:pre}tr:first-child td{color:#ffd23f}a{color:#ff7aa8}
 @media (max-width:480px){td{padding:6px 5px}.sub{font-size:14px}}@media (max-width:360px){table{font-size:14px}}
-main{position:relative}.stage{--px:6px}.scene{position:absolute;top:150px;width:calc(36*var(--px));height:calc(40*var(--px))}
+main{position:relative}.stage{--px:6px}.scene{position:absolute;top:340px;width:calc(36*var(--px));height:calc(40*var(--px))}
 .scene div{position:absolute}.scene svg{display:block;width:100%}.left{left:calc(-36*var(--px) - 40px)}.right{right:calc(-36*var(--px) - 40px)}
 .floor{left:0;right:0;bottom:0;height:calc(3*var(--px));background:#5a3825;border-top:var(--px) solid #6fbf3f}
 .clawd{width:calc(18*var(--px));left:calc(12*var(--px));bottom:calc(4*var(--px))}
@@ -58,7 +58,7 @@ main{position:relative}.stage{--px:6px}.scene{position:absolute;top:150px;width:
 @keyframes swing{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
 @media (max-width:1120px){.stage{--px:4px;position:relative;height:calc(40*var(--px));margin:0 0 24px}.left{left:0}.right{right:0}.scene{top:0}}
 @media (prefers-reduced-motion:reduce){.stage *{animation:none!important}}
-</style></head><body><main><h1>Claude Meatboy</h1><p class="sub">Global leaderboard.<br>Every run is replayed before it counts.<br><a href="https://github.com/jroethel/claude-meatboy">Play it in Claude Code</a><br><a href="https://raw.githubusercontent.com/jroethel/claude-meatboy/main/screenshot.png">See it being played</a></p>
+</style></head><body><main><h1><img src="https://raw.githubusercontent.com/jroethel/claude-meatboy/main/header.svg" alt="Claude Meatboy" width="1032" height="352"></h1><p class="sub">Global leaderboard.<br>Every run is replayed before it counts.<br><a href="https://github.com/jroethel/claude-meatboy">Play it in Claude Code</a><br><a href="https://raw.githubusercontent.com/jroethel/claude-meatboy/main/screenshot.png">See it being played</a></p>
 <div class="stage" aria-hidden="true"><div class="scene left"><div class="dash" style="left:calc(4*var(--px));width:calc(8*var(--px));bottom:calc(12*var(--px));opacity:.7"></div><div class="dash" style="left:calc(1*var(--px));width:calc(10*var(--px));bottom:calc(9*var(--px));opacity:.45"></div><div class="dash" style="left:calc(6*var(--px));width:calc(6*var(--px));bottom:calc(6*var(--px));opacity:.6"></div><div class="clawd">${CLAWD_SVG}</div><div class="floor"></div></div>
 <div class="scene right"><div class="kidnap"><div class="fetus">${pixels(FETUS, FETUS_PALETTE)}</div><div class="rope"></div><div class="girl">${pixels(BANDAGE_ART, BANDAGE_PALETTE)}</div><div class="help">help!</div></div></div></div>
 ${body}</main></body></html>`
