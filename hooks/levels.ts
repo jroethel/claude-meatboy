@@ -87,3 +87,6 @@ export const LEVELS: LevelDef[] = [
     '######################################',
   ]),
 ]
+
+// The tallest level's rows: the map's height in the pane.
+export const MAP_ROWS = Math.max(...LEVELS.map(l => l.rows.length))

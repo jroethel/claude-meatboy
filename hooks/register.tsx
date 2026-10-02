@@ -1,9 +1,11 @@
 import type { EngineInterface, Register } from 'claude-code'
 
-import { LEVELS } from './levels'
+import { LEVELS, MAP_ROWS } from './levels'
 import type { Best, Post, Score, ScreenProps, Track } from './screen'
 
 const PANE = 'meat-boy'
+// The tallest level, the HUD above it and the controls below.
+const PANE_ROWS = MAP_ROWS + 2
 const SFX = {
   jump: 'sounds/jump.wav',
   walljump: 'sounds/walljump.wav',
@@ -113,7 +115,7 @@ export const register: Register = on => {
       const rows = board.slice(0, 10).map((b, n) => `${String(n + 1).padStart(2)}. ${`@${b.handle}`.padEnd(16)}  ${seconds(b.ms).padStart(7)}  ☠ ${b.deaths}`)
       return { text: [title, ...rows].join('\n') }
     }
-    const opened = await $.ui.open({ id: PANE, title: 'Meat Boy', focus: true, closeOnEscape: true, holdToasts: true, rows: 16, columns: 82 })
+    const opened = await $.ui.open({ id: PANE, title: 'Meat Boy', focus: true, closeOnEscape: true, holdToasts: true, rows: PANE_ROWS, columns: 82 })
     if (!opened.isPlaced) return { text: `Meat Boy could not open: ${opened.reason}` }
     await $.ui.focus({ requestId: PANE, key: 'game' })
     return { text: 'Meat Boy is up. Click the level, then ← → to run, Space to jump, Z to hop, hold a click to jump higher, Esc to quit.' }
@@ -131,7 +133,9 @@ export const register: Register = on => {
     const props = await readProps($)
     if (e.surface === 'terminal' || e.surface === 'desktop') {
       const { Client } = $.ui.resolve(e)
-      return <Client key="game" module="./screen.ts" props={props} width={Math.min(e.props.bodyColumns, 80)} height={16} />
+      // No taller than the pane shows: a short terminal gets a short map that scrolls, not a cut-off one.
+      const height = Math.min(PANE_ROWS, e.props.scroll.bodyRows || PANE_ROWS)
+      return <Client key="game" module="./screen.ts" props={props} width={Math.min(e.props.bodyColumns, 80)} height={height} />
     }
     const { Text } = $.ui.resolve(e)
     return <Text dimColor>Meat Boy runs in the terminal and the desktop app.</Text>

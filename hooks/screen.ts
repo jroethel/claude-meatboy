@@ -4,7 +4,7 @@
 import type { ClientElements, ClientKeyEvent, ClientModule, RenderElement } from 'claude-code'
 
 import { DT, GRAB_FRAME, PH, PW, CRUMBLE, SOLID, clearMs, grade, load, step, type Game, type GameEvent, type Input } from './game'
-import { LEVELS } from './levels'
+import { LEVELS, MAP_ROWS } from './levels'
 import { ART, ART_ARM, ART_HAPPY, BANDAGE_ART, BANDAGE_HAPPY, BANDAGE_PALETTE, CLAUDE, FETUS, FETUS_PALETTE, PALETTE, step2 } from './sprite'
 
 export type Best = Record<string, { ms: number; deaths: number }>
@@ -37,7 +37,10 @@ export type State = {
   ending: number
 }
 
-const MAP_ROWS = 14
+// The pane is as tall as the tallest level plus the HUD and the controls; a shorter pane scrolls the map
+// up and down with Meat Boy, and a shorter level sits in the middle between dark bands.
+export const PANE_ROWS = MAP_ROWS + 2
+const MIN_ROWS = 8
 const TITLE_FRAMES = 40
 const SAW_FRAMES = ['◐◑', '◓◒', '◑◐', '◒◓']
 
@@ -269,9 +272,10 @@ function paintArt(c: Canvas, art: string[], palette: Record<string, number>, x0:
   }
 }
 
-function overlays(c: Canvas, s: State, best: Best): void {
+// `top` is the map's first row on the canvas.
+function overlays(c: Canvas, s: State, best: Best, top: number): void {
   const { g } = s
-  const mid = 1 + Math.floor(MAP_ROWS / 2)
+  const mid = 1 + Math.floor((c.rows - 2) / 2)
   if (s.card > 0 && g.phase === 'play') {
     const pick = s.top > 0 ? `keys 1-${s.top + 1} pick a level` : ''
     const lines: [string, number][] = [[`CHAPTER 1 · LEVEL ${g.level + 1}`, GOLD], [LEVELS[g.level]?.name.toUpperCase() ?? '', WHITE], ['', WHITE], ...(pick ? [[pick, 0xb8a0b8] as [string, number]] : []), ['M music: A, B, off', 0xb8a0b8]]
@@ -290,14 +294,14 @@ function overlays(c: Canvas, s: State, best: Best): void {
       })
     }
   }
-  if (g.phase === 'kidnap' && g.kidnapT >= 4) c.center(2, '  DR. FETUS!  ', WHITE, 0xc41e3a)
+  if (g.phase === 'kidnap' && g.kidnapT >= 4) c.center(top + 1, '  DR. FETUS!  ', WHITE, 0xc41e3a)
   if (g.phase === 'replay') {
     const ms = clearMs(g)
     const mark = grade(ms, LEVELS[g.level]?.par ?? 0)
     const prior = best[String(g.level)]
     const isRecord = !s.practice && (prior === undefined || ms <= prior.ms)
     const tag = s.practice ? '  PRACTICE, NOT SAVED' : isRecord ? '  NEW BEST' : ''
-    c.center(2, `  ★ LEVEL CLEAR ★  ${seconds(ms)}  ${mark}  ☠ ${g.deaths}${tag}  `, INK, GOLD)
+    c.center(top + 1, `  ★ LEVEL CLEAR ★  ${seconds(ms)}  ${mark}  ☠ ${g.deaths}${tag}  `, INK, GOLD)
   }
 }
 
@@ -487,30 +491,50 @@ function advance(s: State): void {
   Object.assign(s, fresh(s.g.level + 1, s.results, s.top), { frame: s.frame, practice: s.practice })
 }
 
-// The whole frame for a state: the map with the HUD above and the controls below.
-export function compose(s: State, best: Best, columns: number, board: Score[] = [], track: Track = 'off'): Canvas {
-  const cols = Math.min(Math.max(20, columns || 80), s.g.w * 2)
-  const c = new Canvas(cols, MAP_ROWS + 2)
-  if (s.isOver) {
-    if (s.ending > 0) hugScreen(c, s)
-    else endScreen(c, s, board)
-    return c
-  }
-  const view = cols / 2
-  const focusX = s.g.phase === 'play' ? s.g.px : s.g.goal.x
-  const camX = Math.max(0, Math.min(s.g.w - view, focusX - view / 2))
-  const world = new Canvas(cols, MAP_ROWS)
-  paintWorld(world, s, camX)
-  paintActors(world, s, camX)
-  for (let y = 0; y < MAP_ROWS; y++) {
-    for (let x = 0; x < cols; x++) {
-      const i = y * cols + x
-      c.set(x, y + 1, world.ch[i] ?? ' ', world.fg[i] ?? WHITE, world.bg[i] ?? 0)
+// The end screens are laid out for this many rows, and sit in the middle of a taller pane.
+const END_ROWS = 16
+
+function blit(to: Canvas, from: Canvas, fromY: number, toY: number, rows: number): void {
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < to.cols; x++) {
+      const i = (fromY + y) * from.cols + x
+      to.set(x, toY + y, from.ch[i] ?? ' ', from.fg[i] ?? WHITE, from.bg[i] ?? INK)
     }
   }
+}
+
+// The whole frame for a state: the map with the HUD above and the controls below.
+export function compose(s: State, best: Best, columns: number, board: Score[] = [], track: Track = 'off', height = PANE_ROWS): Canvas {
+  const cols = Math.min(Math.max(20, columns || 80), s.g.w * 2)
+  const rows = Math.min(PANE_ROWS, Math.max(MIN_ROWS, height || PANE_ROWS))
+  const c = new Canvas(cols, rows)
+  for (let i = 0; i < c.bg.length; i++) c.bg[i] = INK
+  if (s.isOver && s.ending > 0) {
+    hugScreen(c, s)
+    return c
+  }
+  if (s.isOver) {
+    const end = new Canvas(cols, END_ROWS)
+    endScreen(end, s, board)
+    blit(c, end, Math.max(0, (END_ROWS - rows) >> 1), Math.max(0, (rows - END_ROWS) >> 1), Math.min(rows, END_ROWS))
+    return c
+  }
+  const { g } = s
+  const isPlay = g.phase === 'play'
+  const view = cols / 2
+  const camX = Math.max(0, Math.min(g.w - view, (isPlay ? g.px : g.goal.x) - view / 2))
+  const mapRows = rows - 2
+  const viewRows = Math.min(g.h, mapRows)
+  // ponytail: the camera centers Meat Boy every frame, no dead zone; add one if the scrolling feels busy.
+  const camY = Math.round(Math.max(0, Math.min(g.h - viewRows, (isPlay ? g.py + PH / 2 : g.goal.y) - viewRows / 2)))
+  const top = 1 + ((mapRows - viewRows) >> 1)
+  const world = new Canvas(cols, g.h)
+  paintWorld(world, s, camX)
+  paintActors(world, s, camX)
+  blit(c, world, camY, top, viewRows)
   hud(c, s, best, track)
   footer(c, s)
-  overlays(c, s, best)
+  overlays(c, s, best, top)
   return c
 }
 
@@ -552,7 +576,7 @@ const Screen: ClientModule<ScreenProps, State> = (props, surface) => {
     surface.setState(s)
   }
 
-  const c = compose(s, props.best ?? {}, surface.columns, props.board ?? [], props.music ?? 'off')
+  const c = compose(s, props.best ?? {}, surface.columns, props.board ?? [], props.music ?? 'off', surface.rows)
   return draw(c, surface.elements)
 }
 
