@@ -8,7 +8,7 @@ Global Leaderboard at [meatboy-scores.jroethel.workers.dev](https://meatboy-scor
 <img src="header.svg" width="100%" alt="A tall programmer, the title CLAUDE MEATBOY in block letters, and Clawd as Meat Boy beside Bandage Girl">
 
 A playable Super Meat Boy tribute inside Claude Code, starring Clawd as Meat Boy.
-Five Chapter 1 levels run in a pane, with saws, wall-jumps, meat smears, Dr. Fetus, and the all-attempts replay.
+Six Chapter 1 levels run in a pane, with saws, wall-jumps, meat smears, Dr. Fetus, and the all-attempts replay.
 Finish a run and it goes on a world scoreboard under your X handle.
 
 ## Play
@@ -28,7 +28,7 @@ Then run `/meatboy` and click the level once so it takes the keys.
 | Z              | Short hop                                                |
 | Click and hold | Jump, higher the longer you hold                         |
 | R              | Restart the level                                        |
-| 1 to 5         | Pick an open level. Any but 1 is practice                |
+| 1 to 6         | Pick an open level. Any but 1 is practice                |
 | M              | Cycle soundtrack A, B and off                            |
 | Esc            | Close the pane                                           |
 
@@ -40,7 +40,7 @@ Practice runs show PRACTICE in place of the timer and save nothing.
 
 ## The world board
 
-A run from 1-1 through 1-5 in order, outside practice, ends by asking for your X handle, up to 15 letters, digits or underscores.
+A run from 1-1 through 1-6 in order, outside practice, ends by asking for your X handle, up to 15 letters, digits or underscores.
 The game sends the handle, the time, the death count and each level's winning inputs to a Cloudflare Worker.
 The Worker replays every level on the game's own physics and stores the time the replay gives, so a run can't be faked by editing its time.
 Deaths are taken as sent and only break ties.

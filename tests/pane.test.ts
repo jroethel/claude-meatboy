@@ -2,6 +2,8 @@ import type { RenderPropsOf } from 'claude-code'
 import type { Mounted } from 'claude-code/testing'
 import { expect, mock, test } from 'claude-code/testing'
 
+import { LEVELS, MAP_ROWS } from '../hooks/levels'
+import { KIDNAP_FRAMES } from '../hooks/game'
 import { verify } from '../hooks/verify'
 import { SOLUTIONS } from './solutions'
 
@@ -13,12 +15,19 @@ const PANE: RenderPropsOf['Pane'] = {
   isFocused: true,
   bodyColumns: 80,
   placement: 'inline',
-  scroll: { offset: 0, bodyRows: 16 },
+  scroll: { offset: 0, bodyRows: MAP_ROWS + 2 },
   view: {},
 }
-const KEYS = { right: 'right', left: 'left', jump: 'space', stop: 'down' } as const
+const KEYS = { right: 'right', left: 'left', jump: 'space', hop: 'z', stop: 'down' } as const
 // Long enough for a level's title card to clear: the level waits behind it.
 const PAST_CARD_MS = 33 * 42
+// Waits out the title card to the frame before the level's first, where its script's frame 0 begins:
+// on levels with saws that move, a frame late is a different level.
+async function pastCard(ui: Ui): Promise<void> {
+  while ((await ui.find({ in: 'game', text: /CHAPTER 1/ })) !== undefined) await ui.advance(33)
+}
+// Frames for level n's script to reach the replay: its last input, the rest of the way, and Dr. Fetus.
+const playFrames = (n: number) => (SOLUTIONS[n]?.at(-1)?.[0] ?? 0) + 40 + KIDNAP_FRAMES
 
 // The engine beneath, as a session answers it: the Meat Boy pane is open.
 const paneOpen = (on: Parameters<typeof mock.store>[0]) =>
@@ -34,7 +43,7 @@ for (const surface of ['terminal', 'desktop'] as const) {
       return { value: undefined }
     })
     const ui = await $.ui.mount({ plugin: 'claude-meatboy', surface, component: 'Pane', requestId: 'meat-boy', props: PANE })
-    await ui.resize({ columns: 80, rows: 16 })
+    await ui.resize({ columns: 80, rows: MAP_ROWS + 2 })
     await ui.advance(40)
     expect(await ui.find({ in: 'game', text: /HELLO WORLD/ })).toBeDefined()
     await ui.advance(PAST_CARD_MS)
@@ -93,7 +102,7 @@ test('a held click jumps higher than a quick one', { timeoutMs: 20_000 }, async 
   paneOpen(on)
   on('audio.play', () => ({ value: undefined }))
   const ui = await $.ui.mount({ plugin: 'claude-meatboy', surface: 'terminal', component: 'Pane', requestId: 'meat-boy', props: PANE })
-  await ui.resize({ columns: 80, rows: 16 })
+  await ui.resize({ columns: 80, rows: MAP_ROWS + 2 })
   await ui.advance(PAST_CARD_MS)
   const ground = meatRow(await ui.drawn({ in: 'game' }))
   const peak = async (holdFrames: number) => {
@@ -114,11 +123,37 @@ test('a held click jumps higher than a quick one', { timeoutMs: 20_000 }, async 
   await ui.unmount()
 })
 
+test('a pane shorter than the level scrolls the map with Meat Boy, and a taller one centers it', { timeoutMs: 20_000 }, async ($, on) => {
+  mock.store(on)
+  paneOpen(on)
+  const lines = (tree: unknown) => (tree as { children: unknown[] }).children.length
+  const short = await $.ui.mount({ plugin: 'claude-meatboy', surface: 'terminal', component: 'Pane', requestId: 'meat-boy', props: { ...PANE, scroll: { offset: 0, bodyRows: 12 } } })
+  await short.resize({ columns: 80, rows: 12 })
+  await pastCard(short)
+  // 1-1 is 14 rows, the map here 10: it scrolls down to Meat Boy, so it shows the level's last 10 rows
+  // and his start, row 9 of them, is 4 rows higher, under the HUD's one.
+  const low = await short.drawn({ in: 'game' })
+  expect(lines(low)).toBe(12)
+  expect(meatRow(low)).toBe(1 + 9 - 4)
+  expect(await short.find({ in: 'game', text: /1-1 HELLO WORLD/ })).toBeDefined()
+  expect(await short.find({ in: 'game', text: /R restart/ })).toBeDefined()
+  await short.unmount()
+
+  const tall = await $.ui.mount({ plugin: 'claude-meatboy', surface: 'terminal', component: 'Pane', requestId: 'meat-boy', props: PANE })
+  await tall.resize({ columns: 80, rows: MAP_ROWS + 2 })
+  await pastCard(tall)
+  // The tallest level fills the map; 1-1's 14 rows sit in its middle, so Meat Boy's start, row 9 of them, moves down by half the rest.
+  const centered = await tall.drawn({ in: 'game' })
+  expect(lines(centered)).toBe(MAP_ROWS + 2)
+  expect(meatRow(centered)).toBe(1 + ((MAP_ROWS - 14) >> 1) + 9)
+  await tall.unmount()
+})
+
 test('the pane opens at 1-1 even with levels open, and number keys pick any open level', async ($, on) => {
   mock.store(on, { best: { '0': { ms: 3300, deaths: 0 }, '1': { ms: 3200, deaths: 2 } } })
   paneOpen(on)
   const ui = await $.ui.mount({ plugin: 'claude-meatboy', surface: 'terminal', component: 'Pane', requestId: 'meat-boy', props: PANE })
-  await ui.resize({ columns: 80, rows: 16 })
+  await ui.resize({ columns: 80, rows: MAP_ROWS + 2 })
   await ui.advance(33)
   expect(await ui.find({ in: 'game', text: /1-1 HELLO WORLD/ })).toBeDefined()
   expect(await ui.find({ in: 'game', text: /keys 1-3 pick a level/ })).toBeDefined()
@@ -135,7 +170,7 @@ test('the level waits behind its title card, dropping keys pressed meanwhile', {
   mock.store(on)
   paneOpen(on)
   const ui = await $.ui.mount({ plugin: 'claude-meatboy', surface: 'terminal', component: 'Pane', requestId: 'meat-boy', props: PANE })
-  await ui.resize({ columns: 80, rows: 16 })
+  await ui.resize({ columns: 80, rows: MAP_ROWS + 2 })
   await ui.advance(33)
   const start = meatCell(await ui.drawn({ in: 'game' }))
   await ui.key({ key: 'right' })
@@ -155,7 +190,7 @@ test('with nothing cleared, the pane opens at 1-1 and the number keys stay shut'
   mock.store(on)
   paneOpen(on)
   const ui = await $.ui.mount({ plugin: 'claude-meatboy', surface: 'terminal', component: 'Pane', requestId: 'meat-boy', props: PANE })
-  await ui.resize({ columns: 80, rows: 16 })
+  await ui.resize({ columns: 80, rows: MAP_ROWS + 2 })
   await ui.key({ key: '2' })
   await ui.advance(33)
   expect(await ui.find({ in: 'game', text: /1-1 HELLO WORLD/ })).toBeDefined()
@@ -168,7 +203,7 @@ test('a level picked by number is practice: its clear is not saved and opens not
   paneOpen(on)
   on('audio.play', () => ({ value: undefined }))
   const ui = await $.ui.mount({ plugin: 'claude-meatboy', surface: 'terminal', component: 'Pane', requestId: 'meat-boy', props: PANE })
-  await ui.resize({ columns: 80, rows: 16 })
+  await ui.resize({ columns: 80, rows: MAP_ROWS + 2 })
   await ui.advance(33)
   expect(await ui.find({ in: 'game', text: /PRACTICE/ })).toBeUndefined()
   expect(await ui.find({ in: 'game', text: /⏱ / })).toBeDefined()
@@ -177,16 +212,16 @@ test('a level picked by number is practice: its clear is not saved and opens not
   // PRACTICE takes the clock's place in the top line.
   expect(await ui.find({ in: 'game', text: /PRACTICE/ })).toBeDefined()
   expect(await ui.find({ in: 'game', text: /⏱ / })).toBeUndefined()
-  await ui.advance(PAST_CARD_MS)
+  await pastCard(ui)
 
   const script = new Map(SOLUTIONS[1])
-  for (let f = 0; f < 200; f++) {
+  for (let f = 0; f < playFrames(1); f++) {
     const action = script.get(f)
     if (action) await ui.key({ key: KEYS[action] })
     await ui.advance(33)
   }
   expect(await ui.find({ in: 'game', text: /LEVEL CLEAR.*PRACTICE, NOT SAVED/ })).toBeDefined()
-  // A 3.1s clear beats the stored 9.00s, but practice leaves the best as it was.
+  // A 5.3s clear beats the stored 9.00s, but practice leaves the best as it was.
   expect(await ui.find({ in: 'game', text: /best 9\.00s/ })).toBeDefined()
 
   // Practice carries on to the next level, and 1-4 stays shut.
@@ -210,9 +245,9 @@ type Ui = Mounted<'terminal', 'Pane'>
 
 // Plays one level by its winning script and moves past its replay.
 async function clearLevel(ui: Ui, n: number): Promise<void> {
-  await ui.advance(PAST_CARD_MS)
+  await pastCard(ui)
   const script = new Map(SOLUTIONS[n])
-  for (let f = 0; f < 260; f++) {
+  for (let f = 0; f < playFrames(n); f++) {
     const action = script.get(f)
     if (action) await ui.key({ key: KEYS[action] })
     await ui.advance(33)
@@ -236,8 +271,8 @@ test('a run from 1-1 to the end asks for an X handle and puts it on the board, h
     return { value: { status: 200, ok: true, headers: {}, text: JSON.stringify(top) } }
   })
   const ui = await $.ui.mount({ plugin: 'claude-meatboy', surface: 'terminal', component: 'Pane', requestId: 'meat-boy', props: PANE })
-  await ui.resize({ columns: 80, rows: 16 })
-  for (let n = 0; n < 5; n++) await clearLevel(ui, n)
+  await ui.resize({ columns: 80, rows: MAP_ROWS + 2 })
+  for (let n = 0; n < LEVELS.length; n++) await clearLevel(ui, n)
   // The hug plays first, then ends on its own.
   await ui.advance(33 * 60)
   expect(await ui.find({ in: 'game', text: /TOGETHER AGAIN/ })).toBeDefined()
@@ -269,14 +304,14 @@ test('a run from 1-1 to the end asks for an X handle and puts it on the board, h
 
 test('a practice run to the end gets no handle prompt and no board', { timeoutMs: 20_000 }, async ($, on) => {
   const best = { ms: 9000, deaths: 0 }
-  mock.store(on, { best: { '0': best, '1': best, '2': best, '3': best } })
+  mock.store(on, { best: { '0': best, '1': best, '2': best, '3': best, '4': best } })
   paneOpen(on)
   on('audio.play', () => ({ value: undefined }))
   const ui = await $.ui.mount({ plugin: 'claude-meatboy', surface: 'terminal', component: 'Pane', requestId: 'meat-boy', props: PANE })
-  await ui.resize({ columns: 80, rows: 16 })
-  await ui.key({ key: '5' })
+  await ui.resize({ columns: 80, rows: MAP_ROWS + 2 })
+  await ui.key({ key: '6' })
   await ui.advance(33)
-  await clearLevel(ui, 4)
+  await clearLevel(ui, 5)
   // Enter skips the hug straight to the results.
   await ui.key({ key: 'return' })
   await ui.advance(33)
@@ -291,7 +326,7 @@ test('Enter skips Dr. Fetus straight to the replay', { timeoutMs: 20_000 }, asyn
   paneOpen(on)
   on('audio.play', () => ({ value: undefined }))
   const ui = await $.ui.mount({ plugin: 'claude-meatboy', surface: 'terminal', component: 'Pane', requestId: 'meat-boy', props: PANE })
-  await ui.resize({ columns: 80, rows: 16 })
+  await ui.resize({ columns: 80, rows: MAP_ROWS + 2 })
   await ui.advance(PAST_CARD_MS)
   const script = new Map(SOLUTIONS[0])
   for (let f = 0; f < 200 && (await ui.find({ in: 'game', text: /DR\. FETUS!/ })) === undefined; f++) {
@@ -316,7 +351,7 @@ test('M cycles soundtrack A, B and off in the open pane; /meatboy music and mute
     return { value: undefined }
   })
   const ui = await $.ui.mount({ plugin: 'claude-meatboy', surface: 'terminal', component: 'Pane', requestId: 'meat-boy', props: PANE })
-  await ui.resize({ columns: 80, rows: 16 })
+  await ui.resize({ columns: 80, rows: MAP_ROWS + 2 })
   await ui.advance(33)
   const hud = async () => (await ui.find({ in: 'game', text: /♪ [AB]/ }))?.text.match(/♪ ([AB])/)?.[1] ?? 'off'
   expect(loops).toEqual(['sounds/music-a.wav'])

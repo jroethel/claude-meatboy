@@ -4,8 +4,8 @@
 import { type Game, clearMs, load, step, unpack } from './game'
 import { LEVELS } from './levels'
 
-// ponytail: caps the five winning attempts at 150s in all (par is about 31s) to bound the replay's CPU; raise it if real runs hit it.
-export const MAX_FRAMES = 4500
+// ponytail: caps the six winning attempts at 270s in all (par is about 55s) to bound the replay's CPU; raise it if real runs hit it.
+export const MAX_FRAMES = 8100
 
 // `levels` holds each level's winning attempt as frame and packed input, pairwise.
 export type Run = { handle: string; ms: number; deaths: number; levels: number[][] }
