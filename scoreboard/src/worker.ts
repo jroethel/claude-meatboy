@@ -17,9 +17,10 @@ function page(rows: Row[]): string {
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Claude Meatboy: global leaderboard</title><style>
 body{margin:0;min-height:100vh;background:linear-gradient(#1b1030,#b4553a);color:#f3e9dc;font:16px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;display:flex;justify-content:center}
-main{padding:48px 20px;width:min(520px,100%)}h1{color:#d77757;font-size:28px;margin:0 0 4px}
+main{padding:48px 20px;width:min(520px,100%);box-sizing:border-box}h1{color:#d77757;font-size:28px;margin:0 0 4px}
 .sub{margin:0 0 28px;opacity:.85}table{border-collapse:collapse;width:100%}td{padding:6px 10px;border-bottom:1px solid #f3e9dc33}
 td:nth-child(3),td:nth-child(4){text-align:right;white-space:pre}tr:first-child td{color:#ffd23f}a{color:#ff7aa8}
+@media (max-width:480px){td{padding:6px 5px}}
 </style></head><body><main><h1>Claude Meatboy</h1><p class="sub">Global leaderboard.<br>Every run is replayed before it counts.<br><a href="https://github.com/jroethel/claude-meatboy">Play it in Claude Code</a></p>
 ${body}</main></body></html>`
 }
