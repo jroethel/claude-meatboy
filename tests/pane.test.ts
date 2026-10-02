@@ -2,7 +2,7 @@ import type { RenderPropsOf } from 'claude-code'
 import type { Mounted } from 'claude-code/testing'
 import { expect, mock, test } from 'claude-code/testing'
 
-import { LEVELS, MAP_ROWS } from '../hooks/levels'
+import { LEVELS, MAP_ROWS, levelKey } from '../hooks/levels'
 import { KIDNAP_FRAMES } from '../hooks/game'
 import { verify } from '../hooks/verify'
 import { SOLUTIONS } from './solutions'
@@ -150,7 +150,7 @@ test('a pane shorter than the level scrolls the map with Meat Boy, and a taller 
 })
 
 test('the pane opens at 1-1 even with levels open, and number keys pick any open level', async ($, on) => {
-  mock.store(on, { best: { '0': { ms: 3300, deaths: 0 }, '1': { ms: 3200, deaths: 2 } } })
+  mock.store(on, { best: { [levelKey(0)]: { ms: 3300, deaths: 0 }, [levelKey(1)]: { ms: 3200, deaths: 2 } } })
   paneOpen(on)
   const ui = await $.ui.mount({ plugin: 'claude-meatboy', surface: 'terminal', component: 'Pane', requestId: 'meat-boy', props: PANE })
   await ui.resize({ columns: 80, rows: MAP_ROWS + 2 })
@@ -199,7 +199,7 @@ test('with nothing cleared, the pane opens at 1-1 and the number keys stay shut'
 })
 
 test('a level picked by number is practice: its clear is not saved and opens nothing', { timeoutMs: 20_000 }, async ($, on) => {
-  mock.store(on, { best: { '0': { ms: 9000, deaths: 0 }, '1': { ms: 9000, deaths: 0 } } })
+  mock.store(on, { best: { [levelKey(0)]: { ms: 9000, deaths: 0 }, [levelKey(1)]: { ms: 9000, deaths: 0 } } })
   paneOpen(on)
   on('audio.play', () => ({ value: undefined }))
   const ui = await $.ui.mount({ plugin: 'claude-meatboy', surface: 'terminal', component: 'Pane', requestId: 'meat-boy', props: PANE })
@@ -304,7 +304,7 @@ test('a run from 1-1 to the end asks for an X handle and puts it on the board, h
 
 test('a practice run to the end gets no handle prompt and no board', { timeoutMs: 20_000 }, async ($, on) => {
   const best = { ms: 9000, deaths: 0 }
-  mock.store(on, { best: { '0': best, '1': best, '2': best, '3': best, '4': best } })
+  mock.store(on, { best: Object.fromEntries([0, 1, 2, 3, 4].map(n => [levelKey(n), best])) })
   paneOpen(on)
   on('audio.play', () => ({ value: undefined }))
   const ui = await $.ui.mount({ plugin: 'claude-meatboy', surface: 'terminal', component: 'Pane', requestId: 'meat-boy', props: PANE })
@@ -391,8 +391,16 @@ test('with the world board out of reach and nothing saved, scores says why', asy
   expect(scores.text).toMatch(/this machine only. The world board is out of reach: [^\n]+\nThe board is empty/)
 })
 
-test('a board saved before handles lists its initials as handles', async ($, on) => {
-  mock.store(on, { board: [{ initials: 'JQX', ms: 20000, deaths: 2 }] })
+test('runs and best times saved on other levels are left behind', async ($, on) => {
+  // As the store was before 1-6: a board under its old key, and best times by level number.
+  mock.store(on, { board: [{ handle: 'JJR', ms: 20000, deaths: 2 }], best: { '0': { ms: 3300, deaths: 0 }, '1': { ms: 3200, deaths: 0 } } })
+  paneOpen(on)
   const scores = await $.command.run({ command: 'meatboy', args: 'scores', ...TYPED })
-  expect(scores.text).toMatch(/ 1\. @JQX +20\.00s  ☠ 2/)
+  expect(scores.text).toMatch(/The board is empty/)
+  const ui = await $.ui.mount({ plugin: 'claude-meatboy', surface: 'terminal', component: 'Pane', requestId: 'meat-boy', props: PANE })
+  await ui.resize({ columns: 80, rows: MAP_ROWS + 2 })
+  await ui.advance(33)
+  expect(await ui.find({ in: 'game', text: /pick a level/ })).toBeUndefined()
+  expect(await ui.find({ in: 'game', text: /par 5\.20s/ })).toBeDefined()
+  await ui.unmount()
 })

@@ -4,7 +4,7 @@
 import type { ClientElements, ClientKeyEvent, ClientModule, RenderElement } from 'claude-code'
 
 import { DT, GRAB_FRAME, PH, PW, CRUMBLE, SOLID, clearMs, grade, load, step, type Game, type GameEvent, type Input } from './game'
-import { LEVELS, MAP_ROWS } from './levels'
+import { LEVELS, MAP_ROWS, levelKey } from './levels'
 import { ART, ART_ARM, ART_HAPPY, BANDAGE_ART, BANDAGE_HAPPY, BANDAGE_PALETTE, CLAUDE, FETUS, FETUS_PALETTE, PALETTE, step2 } from './sprite'
 
 export type Best = Record<string, { ms: number; deaths: number }>
@@ -219,7 +219,7 @@ function hud(c: Canvas, s: State, best: Best, track: Track): void {
   const title = `1-${g.level + 1} ${def?.name.toUpperCase() ?? ''}`
   c.text(1, 0, title, GOLD, bar)
   const ms = Math.round((g.current.length / 2) * DT * 1000)
-  const mine = best[String(g.level)]
+  const mine = best[levelKey(g.level)]
   // In practice the clock gives way to the word, until a run from 1-1 begins.
   const before = `${track === 'off' ? '' : `♪ ${track}   `}☠ ${g.deaths}   `
   const clock = s.practice ? ' PRACTICE ' : `⏱ ${seconds(g.phase === 'replay' || g.phase === 'kidnap' ? clearMs(g) : ms)}`
@@ -298,7 +298,7 @@ function overlays(c: Canvas, s: State, best: Best, top: number): void {
   if (g.phase === 'replay') {
     const ms = clearMs(g)
     const mark = grade(ms, LEVELS[g.level]?.par ?? 0)
-    const prior = best[String(g.level)]
+    const prior = best[levelKey(g.level)]
     const isRecord = !s.practice && (prior === undefined || ms <= prior.ms)
     const tag = s.practice ? '  PRACTICE, NOT SAVED' : isRecord ? '  NEW BEST' : ''
     c.center(top + 1, `  ★ LEVEL CLEAR ★  ${seconds(ms)}  ${mark}  ☠ ${g.deaths}${tag}  `, INK, GOLD)
@@ -476,7 +476,7 @@ export function fresh(level: number, results: Result[], top: number): State {
 
 export function highest(best: Best): number {
   let n = 0
-  while (n + 1 < LEVELS.length && best[String(n)] !== undefined) n++
+  while (n + 1 < LEVELS.length && best[levelKey(n)] !== undefined) n++
   return n
 }
 

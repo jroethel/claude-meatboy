@@ -148,3 +148,14 @@ export const LEVELS: LevelDef[] = [
 
 // The tallest level's rows: the map's height in the pane.
 export const MAP_ROWS = Math.max(...LEVELS.map(l => l.rows.length))
+
+// A level's best time is stored under its number and a hash of its rows, so a level that changes starts with none.
+export const levelKey = (n: number): string => `${n}:${fnv(LEVELS[n]?.rows.join('/') ?? '')}`
+// The local board is stored under a hash of every level: runs on other levels don't compare.
+export const BOARD_KEY = `board:${fnv(LEVELS.map(l => l.rows.join('/')).join('|'))}`
+
+function fnv(s: string): string {
+  let h = 0x811c9dc5
+  for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 0x01000193) >>> 0
+  return h.toString(16).padStart(8, '0')
+}

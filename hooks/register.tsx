@@ -1,6 +1,6 @@
 import type { EngineInterface, Register } from 'claude-code'
 
-import { LEVELS, MAP_ROWS } from './levels'
+import { BOARD_KEY, LEVELS, MAP_ROWS, levelKey } from './levels'
 import type { Best, Post, Score, ScreenProps, Track } from './screen'
 
 const PANE = 'meat-boy'
@@ -16,9 +16,7 @@ const SFX = {
 } as const
 
 const readBest = async ($: EngineInterface): Promise<Best> => ((await $.store.get('best')) as Best | undefined) ?? {}
-// Boards saved before handles hold 3-letter `initials`, read here as the handle.
-const readBoard = async ($: EngineInterface): Promise<Score[]> =>
-  (((await $.store.get('board')) as (Score & { initials?: string })[] | undefined) ?? []).map(({ initials, ...b }) => ({ ...b, handle: b.handle ?? initials ?? '' }))
+const readBoard = async ($: EngineInterface): Promise<Score[]> => ((await $.store.get(BOARD_KEY)) as Score[] | undefined) ?? []
 // ponytail: keeps the 100 fastest runs, enough for one machine's board.
 const BOARD_MAX = 100
 // The world board: a Cloudflare Worker that replays each run before it takes it (scoreboard/).
@@ -154,7 +152,7 @@ export const register: Register = on => {
     if (post.score !== undefined) {
       const { score } = post
       const board = [...(await readBoard($)), score].sort((a, b) => a.ms - b.ms || a.deaths - b.deaths).slice(0, BOARD_MAX)
-      await $.store.set('board', board)
+      await $.store.set(BOARD_KEY, board)
       // ponytail: one try, no retry queue; a run sent while offline stays on this machine's board only.
       if (post.run !== undefined) {
         const body = JSON.stringify({ ...score, levels: post.run })
@@ -165,9 +163,9 @@ export const register: Register = on => {
     if (post.result === undefined) return next(e)
     const { level, ms, deaths } = post.result
     const best = await readBest($)
-    const prior = best[String(level)]
+    const prior = best[levelKey(level)]
     if (prior !== undefined && prior.ms <= ms) return next(e)
-    const updated: Best = { ...best, [String(level)]: { ms, deaths } }
+    const updated: Best = { ...best, [levelKey(level)]: { ms, deaths } }
     await $.store.set('best', updated)
     return { props: await readProps($) }
   })
