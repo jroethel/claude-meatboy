@@ -1,6 +1,6 @@
 # Claude Meat Boy
 
-![A tall programmer, the title CLAUDE MEAT BOY in block letters, and Claude as Meat Boy beside Bandage Girl](header.svg)
+<img src="header.svg" width="100%" alt="A tall programmer, the title CLAUDE MEAT BOY in block letters, and Claude as Meat Boy beside Bandage Girl">
 
 A playable Super Meat Boy tribute inside Claude Code, starring Claude as Meat Boy.
 Five Chapter 1 levels run in a pane, with saws, wall-jumps, meat smears, Dr. Fetus, and the all-attempts replay.
