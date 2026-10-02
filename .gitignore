@@ -1,0 +1,4 @@
+.claude-plugin/types/
+scoreboard/.wrangler/
+node_modules/
+.DS_Store

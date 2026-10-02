@@ -1,0 +1,8 @@
+{
+  "name": "meatboy-scores",
+  "main": "src/worker.ts",
+  "compatibility_date": "2026-10-01",
+  "d1_databases": [
+    { "binding": "DB", "database_name": "meatboy-scores", "database_id": "91c6a36b-b558-4eb4-a0da-0471d05886ba", "migrations_dir": "migrations" }
+  ]
+}
