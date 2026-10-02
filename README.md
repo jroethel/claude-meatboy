@@ -5,10 +5,11 @@ by JR is Tall ([github.com/jroethel](https://github.com/jroethel)&nbsp;&nbsp;x: 
 
 Global Leaderboard at [meatboy-scores.jroethel.workers.dev](https://meatboy-scores.jroethel.workers.dev)
 
-<img src="header.svg" width="100%" alt="A tall programmer, the title CLAUDE MEATBOY in block letters, and Clawd as Meat Boy beside Bandage Girl">
+<img src="header.svg" width="100%" alt="A tall programmer, the title CLAUDE MEATBOY in block letters, and Clawd as Meatboy beside Bandage Girl">
 
-A playable Super Meat Boy tribute inside Claude Code, starring Clawd as Meat Boy.
-Chapter 1 has 6 levels, played in a pane, with saws, wall-jumps, crumbling blocks, meat smears, Dr. Fetus, and the all-attempts replay.
+A whimsical tribute to Super Meat Boy inside Claude Code, starring Clawd as Meatboy.
+
+Chapter 1 of his travails begins with six levels, played in a pane, with saws, wall-jumps, crumbling blocks, meat smears, Dr. Fetus, and the all-attempts replay.
 Chapter 2 is on the way.
 Finish a run and it goes on a world scoreboard under your X handle.
 
@@ -21,11 +22,11 @@ claude --plugin-dir ./claude-meatboy
 
 Then run `/meatboy` and click the level once so it takes the keys.
 The levels are up to 30 rows tall, which fits in a wide terminal's side panel.
-In a narrow terminal the pane opens above the prompt at a third of the height, and the map scrolls with Meat Boy.
+In a narrow terminal the pane opens above the prompt at a third of the height, and the map scrolls with Meatboy.
 
 | Key            | Does                                                     |
 |----------------|----------------------------------------------------------|
-| ← →            | Turn. Meat Boy auto-runs, since terminals have no key-up |
+| ← →            | Turn. Meatboy auto-runs, since terminals have no key-up  |
 | ↓              | Stop                                                     |
 | Space or ↑     | Full jump                                                |
 | Z              | Short hop                                                |
