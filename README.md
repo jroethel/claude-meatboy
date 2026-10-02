@@ -7,7 +7,7 @@ Global Leaderboard at [meatboy-scores.jroethel.workers.dev](https://meatboy-scor
 
 <img src="header.svg" width="100%" alt="A tall programmer, the title CLAUDE MEATBOY in block letters, and Clawd as Meatboy beside Bandage Girl">
 
-A whimsical tribute to Super Meat Boy inside Claude Code, starring Clawd as Meatboy.
+A whimsical tribute to [Super Meatboy](https://store.steampowered.com/app/40800/Super_Meat_Boy/) inside Claude Code, starring Clawd (the mascot) as Meatboy.
 
 Chapter 1 of his travails begins with six levels, played in a pane, with saws, wall-jumps, crumbling blocks, meat smears, Dr. Fetus, and the all-attempts replay.
 Chapter 2 is on the way.
@@ -70,7 +70,7 @@ cd scoreboard && npx wrangler deploy
 
 ## Credits
 
-A fan tribute to Super Meat Boy by Team Meat, not affiliated with or endorsed by them.
+A fan tribute to Super Meatboy by Team Meat, not affiliated with or endorsed by them.
 Clawd is the mascot from Claude Code's banner.
 
 ## Screenshot
