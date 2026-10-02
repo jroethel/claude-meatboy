@@ -1,17 +1,20 @@
-# Claude Meatboy
+## Clawd as Super Meat Boy!
 
-A silly tribute game playable in Claude as Clawd\
+A CC mods tribute to the best indie game of all time (IMO). 
+
 by JR is Tall ([github.com/jroethel](https://github.com/jroethel)&nbsp;&nbsp;x: [@jeremyroethel](https://x.com/jeremyroethel))
 
 Global Leaderboard at [meatboy-scores.jroethel.workers.dev](https://meatboy-scores.jroethel.workers.dev)
 
 <img src="header.svg" width="100%" alt="A tall programmer, the title SUPER MEAT BOY in block letters with CLAWD painted on top of MEAT in dripping blood, so it reads SUPER CLAWD BOY, and Clawd as Meat Boy beside Bandage Girl">
 
-A whimsical tribute to [Super Meat Boy](https://store.steampowered.com/app/40800/Super_Meat_Boy/) inside Claude Code, starring Clawd (the mascot) as Meat Boy.
+A whimsical tribute to [Super Meat Boy](https://store.steampowered.com/app/40800/Super_Meat_Boy/) inside Claude Code, starring Clawd as Meat Boy.
 
-Chapter 1 of his travails begins with six levels, played in a pane, with saws, wall-jumps, crumbling blocks, meat smears, Dr. Fetus, and the all-attempts replay.
-Chapter 2 is on the way.
-Finish a run and it goes on a world scoreboard under your X handle.
+Chapter 1 of his travails begins with six levels as he tries in vain to rescue Bandage Girl from clutches of Dr. Fetus. 
+
+Leave meat smears as Clawd progresses past deadly saws, harrowing wall-jumps, crumbling blocks, and death traps of all manner. 
+
+Finish a run and it goes on a world scoreboard under your @handle. How fast can you complete the rescue run?
 
 ## Play
 
@@ -71,7 +74,7 @@ cd scoreboard && npx wrangler deploy
 ## Credits
 
 A fan tribute to Super Meat Boy by Team Meat, not affiliated with or endorsed by them.
-Clawd is the mascot from Claude Code's banner.
+Clawd is the mascot from Claude Code's banner, not affiliated with or endorsed by them either.
 
 ## Screenshot
 
