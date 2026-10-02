@@ -19,6 +19,13 @@ Finish a run and it goes on a world scoreboard under your @handle. How fast can 
 ## Play
 
 ```
+claude plugin marketplace add jroethel/claude-meatboy
+claude plugin install claude-meatboy@claude-meatboy
+```
+
+Or play from a clone without installing:
+
+```
 git clone https://github.com/jroethel/claude-meatboy
 claude --plugin-dir ./claude-meatboy
 ```
