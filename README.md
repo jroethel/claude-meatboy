@@ -19,6 +19,8 @@ claude --plugin-dir ./claude-meatboy
 ```
 
 Then run `/meatboy` and click the level once so it takes the keys.
+The levels are up to 30 rows tall, which fits in a wide terminal's side panel.
+In a narrow terminal the pane opens above the prompt at a third of the height, and the map scrolls with Meat Boy.
 
 | Key            | Does                                                     |
 |----------------|----------------------------------------------------------|
