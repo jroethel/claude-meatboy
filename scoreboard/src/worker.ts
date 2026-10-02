@@ -58,7 +58,7 @@ main{position:relative}.stage{--px:6px}.scene{position:absolute;top:150px;width:
 @keyframes swing{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
 @media (max-width:1120px){.stage{--px:4px;position:relative;height:calc(40*var(--px));margin:0 0 24px}.left{left:0}.right{right:0}.scene{top:0}}
 @media (prefers-reduced-motion:reduce){.stage *{animation:none!important}}
-</style></head><body><main><h1>Claude Meatboy</h1><p class="sub">Global leaderboard.<br>Every run is replayed before it counts.<br><a href="https://github.com/jroethel/claude-meatboy">Play it in Claude Code</a></p>
+</style></head><body><main><h1>Claude Meatboy</h1><p class="sub">Global leaderboard.<br>Every run is replayed before it counts.<br><a href="https://github.com/jroethel/claude-meatboy">Play it in Claude Code</a><br><a href="https://raw.githubusercontent.com/jroethel/claude-meatboy/main/screenshot.png">See it being played</a></p>
 <div class="stage" aria-hidden="true"><div class="scene left"><div class="dash" style="left:calc(4*var(--px));width:calc(8*var(--px));bottom:calc(12*var(--px));opacity:.7"></div><div class="dash" style="left:calc(1*var(--px));width:calc(10*var(--px));bottom:calc(9*var(--px));opacity:.45"></div><div class="dash" style="left:calc(6*var(--px));width:calc(6*var(--px));bottom:calc(6*var(--px));opacity:.6"></div><div class="clawd">${CLAWD_SVG}</div><div class="floor"></div></div>
 <div class="scene right"><div class="kidnap"><div class="fetus">${pixels(FETUS, FETUS_PALETTE)}</div><div class="rope"></div><div class="girl">${pixels(BANDAGE_ART, BANDAGE_PALETTE)}</div><div class="help">help!</div></div></div></div>
 ${body}</main></body></html>`

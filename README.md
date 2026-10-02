@@ -8,9 +8,11 @@ Global Leaderboard at [meatboy-scores.jroethel.workers.dev](https://meatboy-scor
 <img src="header.svg" width="100%" alt="A tall programmer, the title CLAUDE MEATBOY in block letters, and Clawd as Meat Boy beside Bandage Girl">
 
 A playable Super Meat Boy tribute inside Claude Code, starring Clawd as Meat Boy.
-Level Pack 1 has 6 levels, played in a pane, with saws, wall-jumps, crumbling blocks, meat smears, Dr. Fetus, and the all-attempts replay.
-Level Pack 2 is on the way.
+Chapter 1 has 6 levels, played in a pane, with saws, wall-jumps, crumbling blocks, meat smears, Dr. Fetus, and the all-attempts replay.
+Chapter 2 is on the way.
 Finish a run and it goes on a world scoreboard under your X handle.
+
+<img src="screenshot.png" width="100%" alt="Claude Code with Claude Meatboy in a side pane: 1-3 Buzzsaw Boulevard at 6.50s, Clawd jumping a saw on patrol">
 
 ## Play
 
