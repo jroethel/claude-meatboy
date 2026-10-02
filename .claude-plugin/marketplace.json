@@ -6,7 +6,7 @@
   "description": "Claude Meatboy, a Super Meat Boy tribute playable in Claude Code",
   "plugins": [
     {
-      "name": "claude-meatboy",
+      "name": "meatboy",
       "source": "./",
       "description": "A playable Super Meat Boy tribute in a pane: /meatboy. Saws, wall-jumps, meat smears and the all-attempts replay."
     }

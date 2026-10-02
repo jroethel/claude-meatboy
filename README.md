@@ -20,7 +20,7 @@ Finish a run and it goes on a world scoreboard under your @handle. How fast can 
 
 ```
 claude plugin marketplace add jroethel/claude-meatboy
-claude plugin install claude-meatboy@claude-meatboy
+claude plugin install meatboy@claude-meatboy
 ```
 
 Or play from a clone without installing:
