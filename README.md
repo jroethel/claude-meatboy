@@ -5,9 +5,9 @@ by JR is Tall ([github.com/jroethel](https://github.com/jroethel)&nbsp;&nbsp;x: 
 
 Global Leaderboard at [meatboy-scores.jroethel.workers.dev](https://meatboy-scores.jroethel.workers.dev)
 
-<img src="header.svg" width="100%" alt="A tall programmer, the title CLAUDE MEATBOY in block letters, and Clawd as Meatboy beside Bandage Girl">
+<img src="header.svg" width="100%" alt="A tall programmer, the title CLAUDE MEATBOY in block letters, and Clawd as Meat Boy beside Bandage Girl">
 
-A whimsical tribute to [Super Meatboy](https://store.steampowered.com/app/40800/Super_Meat_Boy/) inside Claude Code, starring Clawd (the mascot) as Meatboy.
+A whimsical tribute to [Super Meat Boy](https://store.steampowered.com/app/40800/Super_Meat_Boy/) inside Claude Code, starring Clawd (the mascot) as Meat Boy.
 
 Chapter 1 of his travails begins with six levels, played in a pane, with saws, wall-jumps, crumbling blocks, meat smears, Dr. Fetus, and the all-attempts replay.
 Chapter 2 is on the way.
@@ -22,11 +22,11 @@ claude --plugin-dir ./claude-meatboy
 
 Then run `/meatboy` and click the level once so it takes the keys.
 The levels are up to 30 rows tall, which fits in a wide terminal's side panel.
-In a narrow terminal the pane opens above the prompt at a third of the height, and the map scrolls with Meatboy.
+In a narrow terminal the pane opens above the prompt at a third of the height, and the map scrolls with Meat Boy.
 
 | Key            | Does                                                     |
 |----------------|----------------------------------------------------------|
-| ← →            | Turn. Meatboy auto-runs, since terminals have no key-up  |
+| ← →            | Turn. Meat Boy auto-runs, since terminals have no key-up |
 | ↓              | Stop                                                     |
 | Space or ↑     | Full jump                                                |
 | Z              | Short hop                                                |
@@ -70,7 +70,7 @@ cd scoreboard && npx wrangler deploy
 
 ## Credits
 
-A fan tribute to Super Meatboy by Team Meat, not affiliated with or endorsed by them.
+A fan tribute to Super Meat Boy by Team Meat, not affiliated with or endorsed by them.
 Clawd is the mascot from Claude Code's banner.
 
 ## Screenshot
