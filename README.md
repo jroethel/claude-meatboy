@@ -12,8 +12,6 @@ Chapter 1 has 6 levels, played in a pane, with saws, wall-jumps, crumbling block
 Chapter 2 is on the way.
 Finish a run and it goes on a world scoreboard under your X handle.
 
-<img src="screenshot.png" width="100%" alt="Claude Code with Claude Meatboy in a side pane: 1-3 Buzzsaw Boulevard at 6.50s, Clawd jumping a saw on patrol">
-
 ## Play
 
 ```
@@ -73,3 +71,7 @@ cd scoreboard && npx wrangler deploy
 
 A fan tribute to Super Meat Boy by Team Meat, not affiliated with or endorsed by them.
 Clawd is the mascot from Claude Code's banner.
+
+## Screenshot
+
+<img src="screenshot.png" width="100%" alt="Claude Code with Claude Meatboy in a side pane: 1-3 Buzzsaw Boulevard after four deaths, Clawd in mid-air over a bloody saw">
