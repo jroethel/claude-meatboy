@@ -1,8 +1,13 @@
-# Claude Meat Boy
+# Claude Meatboy
 
-<img src="header.svg" width="100%" alt="A tall programmer, the title CLAUDE MEAT BOY in block letters, and Claude as Meat Boy beside Bandage Girl">
+A silly tribute game playable in Claude as Clawd\
+by JR is Tall ([github.com/jroethel](https://github.com/jroethel)&nbsp;&nbsp;x: [@jeremyroethel](https://x.com/jeremyroethel))
 
-A playable Super Meat Boy tribute inside Claude Code, starring Claude as Meat Boy.
+Global Leaderboard at [meatboy-scores.jroethel.workers.dev](https://meatboy-scores.jroethel.workers.dev)
+
+<img src="header.svg" width="100%" alt="A tall programmer, the title CLAUDE MEATBOY in block letters, and Clawd as Meat Boy beside Bandage Girl">
+
+A playable Super Meat Boy tribute inside Claude Code, starring Clawd as Meat Boy.
 Five Chapter 1 levels run in a pane, with saws, wall-jumps, meat smears, Dr. Fetus, and the all-attempts replay.
 Finish a run and it goes on a world scoreboard under your X handle.
 
