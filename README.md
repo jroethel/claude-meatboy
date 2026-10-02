@@ -10,7 +10,7 @@ Global Leaderboard at [meatboy-scores.jroethel.workers.dev](https://meatboy-scor
 
 A whimsical tribute to [Super Meat Boy](https://store.steampowered.com/app/40800/Super_Meat_Boy/) inside Claude Code, starring Clawd as Meat Boy.
 
-Chapter 1 of his travails begins with six levels as he tries in vain to rescue Bandage Girl from clutches of Dr. Fetus. 
+Chapter 1 of his travails begins with six levels as he tries in vain to rescue Bandage Girl from the clutches of Dr. Fetus. 
 
 Leave meat smears as Clawd progresses past deadly saws, harrowing wall-jumps, crumbling blocks, and death traps of all manner. 
 
