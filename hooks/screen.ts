@@ -131,7 +131,7 @@ function paintWorld(c: Canvas, s: State, camX: number): void {
       } else if (tile === CRUMBLE && g.broken[i] === 0) {
         const shaking = (g.crumbleT[i] ?? -1) >= 0
         const glyph = shaking && t % 2 === 0 ? '▓' : '▒'
-        for (let d = 0; d < 2; d++) c.set(sx + d, ty, glyph, CRUMBLE_FG, mix(CRUMBLE_BG, BLOOD, smear * 0.7))
+        for (let d = 0; d < 2; d++) c.set(sx + d, ty, glyph, CRUMBLE_FG, mix(CRUMBLE_BG, BLOOD, smear * 0.25))
       }
     }
   }
