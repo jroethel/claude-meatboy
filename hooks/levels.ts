@@ -90,7 +90,7 @@ export const LEVELS: LevelDef[] = [
     '####',
     '####SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS',
   ]),
-  frame('Chutes and Ladders', 9100, [
+  frame('Chutes and Ladders', 9000, [
     '             #S',
     '             #S',
     '             #S',
@@ -100,10 +100,10 @@ export const LEVELS: LevelDef[] = [
     'S    ##S    S#S      S  S###',
     'S    ##S    S#S      #  S###',
     'S    ##S    S#S  S      S###',
-    'S    ##S    S#S  #      S###',
-    'S    ##S    S#S      S  S###   SSSSSSS',
-    'S    ##S    S#S      #  S###',
-    'S    ###S    SS  S      S###',
+    'S    ##S    S#S  #      S###   SS',
+    'S    ##S    S#S      S  S###     SS',
+    'S    ##S    S#S      #  S###       SS',
+    'S    ###S    SS  S      S###         S',
     'S    ###S    SS  #      S###',
     'S    ###S    SS      S  S###',
     'S    ####S    S      #  S###',
