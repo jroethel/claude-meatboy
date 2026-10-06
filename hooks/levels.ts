@@ -90,13 +90,13 @@ export const LEVELS: LevelDef[] = [
     '####',
     '####SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS',
   ]),
-  frame('Edge Lord', 6600, [
+  frame('Edge Lord', 6800, [
     '',
     '',
     '',
-    '                      V',
-    '                                     B',
-    '                                S  ###',
+    '                      V              B',
+    '                                   ###',
+    '                                S',
     '                                #',
     '',
     '',
