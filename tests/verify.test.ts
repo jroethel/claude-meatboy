@@ -46,7 +46,7 @@ describe('verify', () => {
 
   test('rejects edited inputs', () => {
     const { ms, levels } = play()
-    const dropped = levels.map((keys, n) => (n === 2 ? keys.slice(0, 4).concat(keys.slice(6)) : keys))
+    const dropped = levels.map((keys, n) => (n === 2 ? keys.slice(0, 2) : keys))
     expect(verify({ handle: 'JQX', ms, deaths: 1, levels: dropped })).toEqual({ error: expect.stringMatching(/^1-3 /) })
   })
 

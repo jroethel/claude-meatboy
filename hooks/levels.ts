@@ -30,7 +30,7 @@ export const LEVELS: LevelDef[] = [
     '######SSS######SSSSS#######SSS########',
     '######################################',
   ]),
-  frame('Wall Flower', 7000, [
+  frame('Wall Flower', 6000, [
     '                                 #####',
     '                                 #####',
     '                            ##   #####',
@@ -48,7 +48,7 @@ export const LEVELS: LevelDef[] = [
     '##################  ##########',
     '##################SS##########SSSSSSSS',
   ]),
-  frame('Buzzsaw Boulevard', 10100, [
+  frame('Buzzsaw Boulevard', 9100, [
     '',
     '                        V',
     '',
@@ -68,7 +68,7 @@ export const LEVELS: LevelDef[] = [
     '########   ############   ############',
     '########SSS############SSS############',
   ]),
-  frame('Crumble Alley', 8300, [
+  frame('Crumble Alley', 8200, [
     '',
     '',
     '     S            S             S',
@@ -90,7 +90,7 @@ export const LEVELS: LevelDef[] = [
     '####',
     '####SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS',
   ]),
-  frame('Edge Lord', 8900, [
+  frame('Edge Lord', 6900, [
     '',
     '',
     '                                     B',
@@ -116,7 +116,7 @@ export const LEVELS: LevelDef[] = [
     '#########',
     '#########SSSSSSSSSSSSSSSSSSSSSSSSSSSSS',
   ]),
-  frame('Fetus Fury', 14700, [
+  frame('Fetus Fury', 13300, [
     '',
     '',
     '',

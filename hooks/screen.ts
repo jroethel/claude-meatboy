@@ -458,8 +458,9 @@ function onKey(s: State, ev: ClientKeyEvent, post: (p: Post) => void): void {
     if (k === 'r') s.g.replayT = 0
     return
   }
-  if (k === 'left' || k === 'a' || k === 'h') s.pending.left = true
-  if (k === 'right' || k === 'd' || k === 'l') s.pending.right = true
+  // Two arrows in one frame: the later one wins.
+  if (k === 'left' || k === 'a' || k === 'h') { s.pending.left = true; delete s.pending.right }
+  if (k === 'right' || k === 'd' || k === 'l') { s.pending.right = true; delete s.pending.left }
   if (k === 'down' || k === 's' || k === 'j') s.pending.stop = true
   if (k === 'up' || k === 'w' || k === 'k' || k === ' ' || k === 'space') s.pending.jump = true
   if (k === 'z') s.pending.hop = true
