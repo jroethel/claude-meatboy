@@ -1,6 +1,6 @@
 {
   "name": "meatboy",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A playable Super Meat Boy tribute in a pane: /meatboy. Saws, wall-jumps, meat smears and the all-attempts replay.",
   "author": {
     "name": "Jeremy Roethel"
