@@ -3,7 +3,7 @@
 
 import type { ClientElements, ClientKeyEvent, ClientModule, RenderElement } from 'claude-code'
 
-import { BELT_LEFT, BELT_RIGHT, BLADE_CYCLE, BLADE_UP, DT, GRAB_FRAME, PH, PW, CRUMBLE, SOLID, bladeTip, clearMs, grade, load, step, type Game, type GameEvent, type Input } from './game'
+import { BELT_LEFT, BELT_RIGHT, BLADE_CYCLE, BLADE_UP, DT, GRAB_FRAME, PH, PW, CRUMBLE, MARKED, SOLID, STEEL as STEEL_TILE, bladeTip, clearMs, grade, load, step, type Game, type GameEvent, type Input } from './game'
 import { LEVELS, MAP_ROWS, levelKey } from './levels'
 import { ART, ART_ARM, ART_HAPPY, BANDAGE_ART, BANDAGE_HAPPY, BANDAGE_PALETTE, CLAUDE, FETUS, FETUS_PALETTE, PALETTE, step2 } from './sprite'
 
@@ -50,6 +50,7 @@ const HILL = 0x3b1f38
 const HILL_FAR = 0x5a2b3e
 const DIRT = 0x5a3825
 const DIRT_DARK = 0x4a2d1d
+const GOLD_DIRT = 0xc9952a
 const GRASS = 0x6fbf3f
 const MEAT = 0xd81e28
 const BLOOD = 0x8e0d14
@@ -59,6 +60,9 @@ const BANDAGE = 0xff7aa8
 const BELT_BG = 0x3a3f4b
 const BELT_FG = 0xb8c0cc
 const STEEL = 0x6b7080
+const PLATE = 0x8d96a8
+const PLATE_EDGE = 0xd5dce8
+const RIVET = 0x4c5466
 const BLADE = 0xdfe5ee
 const WARN = 0xff5a4a
 const PLANK = 0xd9a441
@@ -128,12 +132,20 @@ function paintWorld(c: Canvas, s: State, camX: number): void {
       const tile = g.tiles[i]
       const sx = Math.round((tx - camX) * 2)
       const smear = (g.smear[i] ?? 0) / 3
-      if (tile === SOLID) {
+      if (tile === SOLID || tile === MARKED) {
         const isTop = ty > 0 && g.tiles[i - g.w] === 0
-        const bg = mix(DIRT, BLOOD, smear * 0.8)
+        const bg = mix(tile === MARKED ? GOLD_DIRT : DIRT, BLOOD, smear * 0.8)
         for (let d = 0; d < 2; d++) {
-          if (isTop) c.set(sx + d, ty, '▀', mix(GRASS, MEAT, smear), bg)
+          if (isTop) c.set(sx + d, ty, '▀', mix(tile === MARKED ? GOLD : GRASS, MEAT, smear), bg)
           else c.set(sx + d, ty, ((tx * 7 + ty * 13 + d) % 9 === 0) ? '░' : ' ', DIRT_DARK, bg)
+        }
+      } else if (tile === STEEL_TILE) {
+        // Plate with a bright top edge and a rivet every other row: nothing to grip.
+        const isTop = ty > 0 && g.tiles[i - g.w] === 0
+        const bg = mix(PLATE, BLOOD, smear * 0.4)
+        for (let d = 0; d < 2; d++) {
+          if (isTop) c.set(sx + d, ty, '▀', PLATE_EDGE, bg)
+          else c.set(sx + d, ty, d === 0 && ty % 2 === 0 ? '•' : ' ', RIVET, bg)
         }
       } else if (tile === BELT_LEFT || tile === BELT_RIGHT) {
         // Chevrons that run the way the belt carries, a cell every 3 frames: 5 tiles a second.

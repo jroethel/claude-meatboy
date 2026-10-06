@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'claude-code/testing'
 
-import { BLADE_CYCLE, BLADE_UP, KIDNAP_FRAMES, PH, load, step, type Game, type GameEvent, type Input } from '../hooks/game'
+import { BLADE_CYCLE, BLADE_UP, KIDNAP_FRAMES, PH, PW, load, step, type Game, type GameEvent, type Input } from '../hooks/game'
 import { LEVELS } from '../hooks/levels'
 import { SOLUTIONS } from './solutions'
 
@@ -77,16 +77,19 @@ describe('chapter 1', () => {
       g.px = x
       g.py = feet - PH - 1e-4
     }
-    const belt = load(5)
-    stand(belt, 8, 17)
-    step(belt)
-    const x0 = belt.px
-    for (let f = 0; f < 30; f++) step(belt)
-    expect(Math.round((belt.px - x0) * 100) / 100).toBe(5)
-    // Standing under the first blade, which runs on the level's clock, on a floor that doesn't move: it drops once it has hung up.
+    // The middle floor's two belts carry you toward each other, at 5 tiles a second.
+    for (const [x, by] of [[11, 1], [26, -1]] as const) {
+      const belt = load(5)
+      stand(belt, x, 17)
+      step(belt)
+      const x0 = belt.px
+      for (let f = 0; f < 6; f++) step(belt)
+      expect(Math.round((belt.px - x0) * 100) / 100).toBe(by)
+    }
+    // Standing under the blade over the start, which runs on the level's clock, on a floor that doesn't move: it drops once it has hung up.
     const blade = load(5)
-    blade.tiles[17 * blade.w + 27] = 1
-    stand(blade, 27.1, 17)
+    blade.tiles[24 * blade.w + 1] = 1
+    stand(blade, 1.1, 24)
     let f = 0
     while (f < 120 && !step(blade).includes('death')) f++
     expect(f).toBeGreaterThanOrEqual(BLADE_UP)
@@ -102,6 +105,22 @@ describe('chapter 1', () => {
       for (let k = 0; k < 6; k++) step(g)
       expect(g.ride).toBe(g.platforms.indexOf(p))
       expect(Math.round((lift ? y - g.py : g.px - x) * 100) / 100).toBe(0.8)
+    }
+  })
+
+  test("steel can't be clung to or kicked off, and ground can", () => {
+    // Falling beside 1-5's climb: its outer wall is steel, the column across from it is ground.
+    for (const [x, steel] of [[2 + 1e-4, true], [6 - PW - 1e-4, false]] as const) {
+      const g = load(4)
+      g.px = x
+      g.py = 10
+      g.vy = 8
+      g.facing = steel ? -1 : 1
+      g.running = true
+      step(g)
+      const events = step(g, { jump: true })
+      expect(events.includes('walljump')).toBe(!steel)
+      if (steel) expect(g.vy).toBeGreaterThan(8)
     }
   })
 

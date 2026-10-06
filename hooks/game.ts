@@ -27,9 +27,9 @@ const SAW_SPEED = 5
 const BELT = 5
 const PLATFORM_SPEED = 4
 // A guillotine's cycle in frames: hanging up, dropping, down on the floor, rising. It is down most of the time.
-export const BLADE_UP = 16
+export const BLADE_UP = 19
 const BLADE_DROP = 3
-const BLADE_DOWN = 36
+const BLADE_DOWN = 33
 const BLADE_RISE = 5
 export const BLADE_CYCLE = BLADE_UP + BLADE_DROP + BLADE_DOWN + BLADE_RISE
 // How far a raised blade hangs below its ceiling.
@@ -49,6 +49,10 @@ export const SOLID = 1
 export const CRUMBLE = 2
 export const BELT_LEFT = 3
 export const BELT_RIGHT = 4
+// Steel: solid to stand on, but too slick to cling to, so you neither slide on it nor kick off it.
+export const STEEL = 5
+// Ground marked in gold: a ledge on the fastest route. It plays as ground.
+export const MARKED = 6
 
 // `jump` is a held jump (Space, or the mouse until `release`); `hop` is a jump let go at once.
 export type Input = { left?: boolean; right?: boolean; jump?: boolean; hop?: boolean; release?: boolean; stop?: boolean }
@@ -132,9 +136,11 @@ export function load(level: number): Game {
       else if (c === '=') tiles[y * w + x] = CRUMBLE
       else if (c === '<') tiles[y * w + x] = BELT_LEFT
       else if (c === '>') tiles[y * w + x] = BELT_RIGHT
+      else if (c === '|') tiles[y * w + x] = STEEL
+      else if (c === '*') tiles[y * w + x] = MARKED
       else if (c !== undefined && c >= '0' && c <= '9') {
         let floor = y + 1
-        while (floor < h && !'#=<>'.includes(def.rows[floor]?.[x] ?? '#')) floor++
+        while (floor < h && !'#=<>|*'.includes(def.rows[floor]?.[x] ?? '#')) floor++
         blades.push({ x, top: y, floor, phase: (Number(c) * BLADE_CYCLE) / 10 })
       } else if ((c === '~' || c === '^') && row[x - 1] !== c) {
         // A run of ~ slides along the - beside it; a run of ^ lifts along the : above and below its first tile.
@@ -240,11 +246,12 @@ function touchesBlade(g: Game): boolean {
   return g.blades.some(b => g.px < b.x + 0.85 && g.px + PW > b.x + 0.15 && g.py < bladeTip(g, b) && g.py + PH > b.top)
 }
 
-function hitsSolid(g: Game, x: number, y: number): boolean {
+// With `grip`, only what can be clung to counts: not steel.
+function hitsSolid(g: Game, x: number, y: number, grip = false): boolean {
   const e = 1e-6
   for (let ty = Math.floor(y); ty <= Math.floor(y + PH - e); ty++) {
     for (let tx = Math.floor(x); tx <= Math.floor(x + PW - e); tx++) {
-      if (isSolid(g, tx, ty)) return true
+      if (isSolid(g, tx, ty) && !(grip && g.tiles[ty * g.w + tx] === STEEL)) return true
     }
   }
   return false
@@ -260,8 +267,8 @@ function probe(g: Game): void {
   }
   g.ride = g.vy >= 0 ? platformUnder(g) : -1
   g.onGround = ground || g.ride >= 0
-  const right = hitsSolid(g, g.px + 0.03, g.py)
-  const left = hitsSolid(g, g.px - 0.03, g.py)
+  const right = hitsSolid(g, g.px + 0.03, g.py, true)
+  const left = hitsSolid(g, g.px - 0.03, g.py, true)
   g.wall = right ? 1 : left ? -1 : 0
 }
 
