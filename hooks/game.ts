@@ -23,6 +23,17 @@ const COYOTE = 0.08
 const BUFFER = 0.12
 const CRUMBLE_DELAY = 0.35
 const SAW_SPEED = 5
+// A belt carries what stands on it at this speed; running against it, you make RUN - BELT.
+const BELT = 5
+const PLATFORM_SPEED = 4
+// A guillotine's cycle in frames: hanging up, dropping, down on the floor, rising. It is down most of the time.
+export const BLADE_UP = 16
+const BLADE_DROP = 3
+const BLADE_DOWN = 36
+const BLADE_RISE = 5
+export const BLADE_CYCLE = BLADE_UP + BLADE_DROP + BLADE_DOWN + BLADE_RISE
+// How far a raised blade hangs below its ceiling.
+const BLADE_HANG = 0.4
 export const SAW_R = 0.5
 export const PW = 0.8
 export const PH = 0.9
@@ -36,6 +47,8 @@ export const GRAB_FRAME = 26
 export const EMPTY = 0
 export const SOLID = 1
 export const CRUMBLE = 2
+export const BELT_LEFT = 3
+export const BELT_RIGHT = 4
 
 // `jump` is a held jump (Space, or the mouse until `release`); `hop` is a jump let go at once.
 export type Input = { left?: boolean; right?: boolean; jump?: boolean; hop?: boolean; release?: boolean; stop?: boolean }
@@ -46,6 +59,11 @@ export const unpack = (mask: number): Input => Object.fromEntries(INPUT_BITS.fil
 export type GameEvent = 'jump' | 'walljump' | 'death' | 'clear' | 'kidnap'
 export type Phase = 'play' | 'dead' | 'kidnap' | 'replay'
 export type Saw = { x0: number; y0: number; vx0: number; vy0: number; x: number; y: number; vx: number; vy: number; bloody: boolean }
+// A blade hangs in column `x` from row `top`, drops to the floor at `floor`, and runs `phase` frames ahead of the level clock.
+export type Blade = { x: number; top: number; floor: number; phase: number }
+// A platform `w` tiles wide that you can jump up through and stand on, riding to and fro along its track:
+// its x (or y, for a lift) runs from `lo` to `hi`.
+export type Platform = { lift: boolean; w: number; lo: number; hi: number; x0: number; y0: number; v0: number; x: number; y: number; v: number }
 export type Particle = { x: number; y: number; vx: number; vy: number; stuck: boolean }
 // One attempt: x and y per frame, in hundredths of a tile, and whether it ended on a saw.
 export type Attempt = { path: number[]; died: boolean }
@@ -61,6 +79,12 @@ export type Game = {
   broken: Uint8Array
   smear: Uint8Array
   saws: Saw[]
+  blades: Blade[]
+  platforms: Platform[]
+  // The platform Meat Boy stands on, or -1.
+  ride: number
+  // Frames since the attempt began, which times the blades.
+  beat: number
   start: { x: number; y: number }
   goal: { x: number; y: number }
   px: number
@@ -96,6 +120,8 @@ export function load(level: number): Game {
   const w = def.rows[0]?.length ?? 0
   const tiles = new Uint8Array(w * h)
   const saws: Saw[] = []
+  const blades: Blade[] = []
+  const platforms: Platform[] = []
   let start = { x: 1, y: 1 }
   let goal = { x: w - 2, y: 1 }
   def.rows.forEach((row, y) => {
@@ -104,6 +130,26 @@ export function load(level: number): Game {
       const c = row[x]
       if (c === '#') tiles[y * w + x] = SOLID
       else if (c === '=') tiles[y * w + x] = CRUMBLE
+      else if (c === '<') tiles[y * w + x] = BELT_LEFT
+      else if (c === '>') tiles[y * w + x] = BELT_RIGHT
+      else if (c !== undefined && c >= '0' && c <= '9') {
+        let floor = y + 1
+        while (floor < h && !'#=<>'.includes(def.rows[floor]?.[x] ?? '#')) floor++
+        blades.push({ x, top: y, floor, phase: (Number(c) * BLADE_CYCLE) / 10 })
+      } else if ((c === '~' || c === '^') && row[x - 1] !== c) {
+        // A run of ~ slides along the - beside it; a run of ^ lifts along the : above and below its first tile.
+        let width = 1
+        while (row[x + width] === c) width++
+        const lift = c === '^'
+        const track = (dx: number, dy: number) => (lift ? def.rows[y + dy]?.[x] : row[x + dx]) === (lift ? ':' : '-')
+        let lo = 0
+        let hi = 0
+        while (track(lo - 1, lo - 1)) lo--
+        while (track(width + hi, hi + 1)) hi++
+        const at = lift ? y : x
+        const v0 = hi > 0 ? PLATFORM_SPEED : -PLATFORM_SPEED
+        platforms.push({ lift, w: width, lo: at + lo, hi: at + hi, x0: x, y0: y, v0, x, y, v: v0 })
+      }
       else if (c === 'P') start = { x: x + (1 - PW) / 2, y: y + (1 - PH) }
       else if (c === 'B') goal = { x, y }
       else if (c === 'S' || c === 'H' || c === 'V') {
@@ -123,6 +169,10 @@ export function load(level: number): Game {
     broken: new Uint8Array(w * h),
     smear: new Uint8Array(w * h),
     saws,
+    blades,
+    platforms,
+    ride: -1,
+    beat: 0,
     start,
     goal,
     px: start.x,
@@ -158,7 +208,36 @@ export function isSolid(g: Game, tx: number, ty: number): boolean {
   if (ty >= g.h) return false
   const i = ty * g.w + tx
   const t = g.tiles[i]
-  return t === SOLID || (t === CRUMBLE && g.broken[i] === 0)
+  return t !== EMPTY && (t !== CRUMBLE || g.broken[i] === 0)
+}
+
+// The platform under the player's feet, or -1.
+function platformUnder(g: Game): number {
+  const feet = g.py + PH
+  return g.platforms.findIndex(p => feet > p.y - 0.03 && feet < p.y + 0.03 && g.px < p.x + p.w && g.px + PW > p.x)
+}
+
+// The speed the belt under the player's middle carries them at.
+function beltUnder(g: Game): number {
+  const t = g.tiles[Math.floor(g.py + PH + 0.02) * g.w + Math.floor(g.px + PW / 2)]
+  return t === BELT_RIGHT ? BELT : t === BELT_LEFT ? -BELT : 0
+}
+
+// How far down a blade reaches: its tip.
+export function bladeTip(g: Game, b: Blade): number {
+  const up = b.top + BLADE_HANG
+  let f = (g.beat + b.phase) % BLADE_CYCLE
+  if (f < BLADE_UP) return up
+  f -= BLADE_UP
+  if (f < BLADE_DROP) return up + ((b.floor - up) * (f + 1)) / BLADE_DROP
+  f -= BLADE_DROP
+  if (f < BLADE_DOWN) return b.floor
+  f -= BLADE_DOWN
+  return b.floor - ((b.floor - up) * (f + 1)) / BLADE_RISE
+}
+
+function touchesBlade(g: Game): boolean {
+  return g.blades.some(b => g.px < b.x + 0.85 && g.px + PW > b.x + 0.15 && g.py < bladeTip(g, b) && g.py + PH > b.top)
 }
 
 function hitsSolid(g: Game, x: number, y: number): boolean {
@@ -179,7 +258,8 @@ function probe(g: Game): void {
   for (let tx = Math.floor(g.px); tx <= Math.floor(g.px + PW - e); tx++) {
     if (isSolid(g, tx, feet)) ground = true
   }
-  g.onGround = ground
+  g.ride = g.vy >= 0 ? platformUnder(g) : -1
+  g.onGround = ground || g.ride >= 0
   const right = hitsSolid(g, g.px + 0.03, g.py)
   const left = hitsSolid(g, g.px - 0.03, g.py)
   g.wall = right ? 1 : left ? -1 : 0
@@ -192,6 +272,25 @@ function rand(g: Game): number {
 
 function approach(v: number, target: number, delta: number): number {
   return v < target ? Math.min(target, v + delta) : Math.max(target, v - delta)
+}
+
+// Platforms ride their tracks, carrying whoever stands on one.
+function movePlatforms(g: Game): void {
+  g.platforms.forEach((p, n) => {
+    const at = p.lift ? p.y : p.x
+    const to = Math.max(p.lo, Math.min(p.hi, at + p.v * DT))
+    if (to === p.lo || to === p.hi) p.v = to === p.lo ? Math.abs(p.v) : -Math.abs(p.v)
+    if (p.lift) p.y = to
+    else p.x = to
+    if (g.phase !== 'play' || g.ride !== n) return
+    const nx = p.lift ? g.px : g.px + to - at
+    const ny = p.lift ? g.py + to - at : g.py
+    if (!hitsSolid(g, nx, ny)) {
+      g.px = nx
+      g.py = ny
+    }
+    probe(g)
+  })
 }
 
 function moveSaws(g: Game): void {
@@ -293,6 +392,12 @@ function respawn(g: Game): void {
     s.vx = s.vx0
     s.vy = s.vy0
   }
+  for (const p of g.platforms) {
+    p.x = p.x0
+    p.y = p.y0
+    p.v = p.v0
+  }
+  g.beat = 0
   probe(g)
 }
 
@@ -303,7 +408,9 @@ export function step(g: Game, input: Input = {}): GameEvent[] {
     g.replayT += 1
     return events
   }
+  g.beat += 1
   moveSaws(g)
+  movePlatforms(g)
   moveParticles(g)
   if (g.phase === 'kidnap') {
     g.kidnapT += 1
@@ -359,7 +466,7 @@ export function step(g: Game, input: Input = {}): GameEvent[] {
   const dt = DT / SUB
   const speed = RUN + (RUN_MAX - RUN) * Math.min(1, g.runT / RAMP)
   for (let i = 0; i < SUB; i++) {
-    const target = g.running ? g.facing * speed : 0
+    const target = (g.running ? g.facing * speed : 0) + (g.onGround ? beltUnder(g) : 0)
     g.vx = approach(g.vx, target, (g.onGround ? ACCEL_GROUND : ACCEL_AIR) * dt)
     g.vy = Math.min(TERMINAL, g.vy + G * (g.vy < 0 && !g.held ? RISE_CUT : 1) * dt)
     const sliding = !g.onGround && g.wall !== 0 && g.wall === g.facing && g.running && g.vy > SLIDE
@@ -374,15 +481,20 @@ export function step(g: Game, input: Input = {}): GameEvent[] {
       g.px = nx
     }
     const ny = g.py + g.vy * dt
+    // Falling onto a platform: the feet cross its top, or were just past it as a lift rose.
+    const deck = g.vy >= 0 ? g.platforms.find(p => g.py + PH <= p.y + PLATFORM_SPEED * DT + 1e-3 && ny + PH >= p.y && g.px < p.x + p.w && g.px + PW > p.x) : undefined
     if (hitsSolid(g, g.px, ny)) {
       g.py = g.vy > 0 ? Math.floor(ny + PH) - PH - 1e-4 : Math.floor(ny) + 1 + 1e-4
+      g.vy = 0
+    } else if (deck !== undefined) {
+      g.py = deck.y - PH - 1e-4
       g.vy = 0
     } else {
       g.py = ny
     }
     probe(g)
     const saw = touchesSaw(g)
-    if (saw !== undefined || g.py > g.h + 1) {
+    if (saw !== undefined || touchesBlade(g) || g.py > g.h + 1) {
       if (saw !== undefined) saw.bloody = true
       die(g, events)
       return events

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'claude-code/testing'
 
-import { KIDNAP_FRAMES, load, step, type GameEvent, type Input } from '../hooks/game'
+import { BLADE_CYCLE, BLADE_UP, KIDNAP_FRAMES, PH, load, step, type Game, type GameEvent, type Input } from '../hooks/game'
 import { LEVELS } from '../hooks/levels'
 import { SOLUTIONS } from './solutions'
 
@@ -70,6 +70,39 @@ describe('chapter 1', () => {
     step(g, { right: true })
     for (let f = 0; f < 8; f++) step(g)
     expect(g.vx).toBeLessThan(10.5)
+  })
+
+  test("1-6's belts carry you, its blades cut, and its platforms carry you", () => {
+    const stand = (g: Game, x: number, feet: number) => {
+      g.px = x
+      g.py = feet - PH - 1e-4
+    }
+    const belt = load(5)
+    stand(belt, 8, 17)
+    step(belt)
+    const x0 = belt.px
+    for (let f = 0; f < 30; f++) step(belt)
+    expect(Math.round((belt.px - x0) * 100) / 100).toBe(5)
+    // Standing under the first blade, which runs on the level's clock, on a floor that doesn't move: it drops once it has hung up.
+    const blade = load(5)
+    blade.tiles[17 * blade.w + 27] = 1
+    stand(blade, 27.1, 17)
+    let f = 0
+    while (f < 120 && !step(blade).includes('death')) f++
+    expect(f).toBeGreaterThanOrEqual(BLADE_UP)
+    expect(f).toBeLessThan(BLADE_CYCLE)
+    expect(blade.deaths).toBe(1)
+    for (const lift of [false, true]) {
+      const g = load(5)
+      const p = g.platforms.find(k => k.lift === lift)
+      if (p === undefined) throw new Error('no platform')
+      stand(g, p.x + 0.5, p.y)
+      step(g)
+      const [x, y] = [g.px, g.py]
+      for (let k = 0; k < 6; k++) step(g)
+      expect(g.ride).toBe(g.platforms.indexOf(p))
+      expect(Math.round((lift ? y - g.py : g.px - x) * 100) / 100).toBe(0.8)
+    }
   })
 
   test('Dr. Fetus takes Bandage Girl after a clear, once, before the replay', () => {

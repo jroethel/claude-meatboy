@@ -3,7 +3,7 @@
 
 import type { ClientElements, ClientKeyEvent, ClientModule, RenderElement } from 'claude-code'
 
-import { DT, GRAB_FRAME, PH, PW, CRUMBLE, SOLID, clearMs, grade, load, step, type Game, type GameEvent, type Input } from './game'
+import { BELT_LEFT, BELT_RIGHT, BLADE_CYCLE, BLADE_UP, DT, GRAB_FRAME, PH, PW, CRUMBLE, SOLID, bladeTip, clearMs, grade, load, step, type Game, type GameEvent, type Input } from './game'
 import { LEVELS, MAP_ROWS, levelKey } from './levels'
 import { ART, ART_ARM, ART_HAPPY, BANDAGE_ART, BANDAGE_HAPPY, BANDAGE_PALETTE, CLAUDE, FETUS, FETUS_PALETTE, PALETTE, step2 } from './sprite'
 
@@ -56,6 +56,13 @@ const BLOOD = 0x8e0d14
 const CRUMBLE_BG = 0xa07b45
 const CRUMBLE_FG = 0x6e5030
 const BANDAGE = 0xff7aa8
+const BELT_BG = 0x3a3f4b
+const BELT_FG = 0xb8c0cc
+const STEEL = 0x6b7080
+const BLADE = 0xdfe5ee
+const WARN = 0xff5a4a
+const PLANK = 0xd9a441
+const TRACK = 0x7a6a8a
 const WHITE = 0xffffff
 const INK = 0x140a14
 const GOLD = 0xffd23f
@@ -128,6 +135,13 @@ function paintWorld(c: Canvas, s: State, camX: number): void {
           if (isTop) c.set(sx + d, ty, '▀', mix(GRASS, MEAT, smear), bg)
           else c.set(sx + d, ty, ((tx * 7 + ty * 13 + d) % 9 === 0) ? '░' : ' ', DIRT_DARK, bg)
         }
+      } else if (tile === BELT_LEFT || tile === BELT_RIGHT) {
+        // Chevrons that run the way the belt carries, a cell every 3 frames: 5 tiles a second.
+        const dir = tile === BELT_RIGHT ? 1 : -1
+        for (let d = 0; d < 2; d++) {
+          const lit = (((tx * 2 + d - dir * Math.floor(t / 3)) % 4) + 4) % 4 === 0
+          c.set(sx + d, ty, lit ? (dir === 1 ? '›' : '‹') : '═', BELT_FG, mix(BELT_BG, BLOOD, smear * 0.6))
+        }
       } else if (tile === CRUMBLE && g.broken[i] === 0) {
         const shaking = (g.crumbleT[i] ?? -1) >= 0
         const glyph = shaking && t % 2 === 0 ? '▓' : '▒'
@@ -157,6 +171,26 @@ function paintActors(c: Canvas, s: State, camX: number): void {
   }
   if (fetus === undefined && t % 30 < 20) c.set(gx + 1, g.goal.y - 1, '♥', 0xff4d88)
   if (fetus !== undefined) paintArt(c, FETUS, FETUS_PALETTE, jx, fetus.top)
+  for (const p of g.platforms) {
+    // Its track, then the plank: a half block, so whoever rides it stands right on top.
+    const row = Math.floor(p.y + 0.55)
+    if (p.lift) for (let y = p.lo; y <= p.hi; y++) for (const x of [col(p.x0) + 1, col(p.x0 + p.w) - 2]) c.set(x, y, '┊', TRACK)
+    else for (let x = col(p.lo); x < col(p.hi + p.w); x++) c.set(x, row, '╌', TRACK)
+    for (let x = col(p.x); x < col(p.x + p.w); x++) c.set(x, row, '▀', PLANK)
+  }
+  for (const b of g.blades) {
+    // The shaft from the ceiling, and the blade at its tip, which flashes just before it drops.
+    const x = col(b.x)
+    const tip = Math.floor(bladeTip(g, b) - 1e-3)
+    const f = (g.beat + b.phase) % BLADE_CYCLE
+    const warn = f >= BLADE_UP - 8 && f < BLADE_UP && g.beat % 2 === 0
+    for (let y = b.top; y < tip; y++) {
+      c.set(x, y, '▐', STEEL)
+      c.set(x + 1, y, '▌', STEEL)
+    }
+    c.set(x, tip, '◥', warn ? WARN : BLADE)
+    c.set(x + 1, tip, '◤', warn ? WARN : BLADE)
+  }
   for (const p of g.particles) c.set(col(p.x), Math.floor(p.y), p.stuck ? '▪' : '•', p.stuck ? BLOOD : MEAT)
   for (const saw of g.saws) {
     const glyphs = SAW_FRAMES[(t >> 1) % SAW_FRAMES.length] ?? '◐◑'

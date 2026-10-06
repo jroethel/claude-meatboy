@@ -1,5 +1,7 @@
 // Chapter 1. Each level is its interior: the frame of solid tiles is added here.
 // # ground   = crumbles a moment after you land   S saw   H saw on patrol   V saw on a lift
+// > < belt carrying right or left   0-9 guillotine, its digit how many tenths of a cycle it runs ahead
+// ~ platform sliding along its - track   ^ lift riding its : track (above and below its first tile)
 // P Meat Boy   B Bandage Girl. `par` is the A+ time in milliseconds.
 
 export type LevelDef = { name: string; par: number; rows: string[] }
@@ -116,24 +118,24 @@ export const LEVELS: LevelDef[] = [
     'S    ##S                    S###S    S',
     '  P  #S                      ###  B',
   ]),
-  frame('Fetus Fury', 13600, [
+  frame('Fetus Fury', 20700, [
     '',
-    '',
-    '',
-    '',
-    '',
-    '              S       S',
+    '                                     B',
+    '                            :  S>>>>>>',
+    '    #                       :',
+    '    #                       :',
+    '    #                       :',
+    '    #             ~~~------ :',
+    'H   #       S  S            :',
+    '    #       S##S            :',
+    '    #                       ^^',
+    '    #SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS',
+    '    ##################################',
+    '   H#        1  7      4  0',
     '    #',
-    'H   #',
-    '    #                           # H #B',
-    '    ####### =   =   =   =   = ########',
-    '    #      SSSSSSSSSSSSSSSSSSS',
-    '    #',
-    '   H#    V',
-    '    #',
     '',
     '',
-    '#############=  ==  =  ==  =######',
+    '######>>>>>>>>>>>>>>>>>>>>>>>>####',
     '             SSSSSSSSSSSSSSS     #',
     '                                 #',
     '                                 #   H',
