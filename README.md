@@ -16,6 +16,12 @@ Leave meat smears as Clawd progresses past deadly saws, harrowing wall-jumps, cr
 
 Finish a run and it goes on a world scoreboard under your @handle. How fast can you complete the rescue run?
 
+## Requirements
+
+- Claude Code in a terminal.
+- **Sound and music play on macOS only.** On Windows and Linux the game runs silently.
+- A network connection to post runs to the world board. Offline, runs stay on your machine's board.
+
 ## Play
 
 ```
@@ -51,7 +57,6 @@ Jump while sliding down a wall to wall-jump.
 Practice runs show PRACTICE in place of the timer and save nothing.
 
 `/meatboy scores` prints the world top ten, `/meatboy music a`, `b` or `off` picks a soundtrack, and `/meatboy mute` silences everything.
-Sound and music play on macOS only.
 
 ## The world board
 
