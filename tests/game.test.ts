@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'claude-code/testing'
 
-import { BLADE_CYCLE, BLADE_UP, KIDNAP_FRAMES, PH, PW, load, step, type Game, type GameEvent, type Input } from '../hooks/game'
+import { BLADE_CYCLE, KIDNAP_FRAMES, PH, PW, load, step, type Game, type GameEvent, type Input } from '../hooks/game'
 import { LEVELS } from '../hooks/levels'
 import { SOLUTIONS } from './solutions'
 
@@ -77,8 +77,8 @@ describe('chapter 1', () => {
       g.px = x
       g.py = feet - PH - 1e-4
     }
-    // The middle floor's two belts carry you toward each other, at 5 tiles a second.
-    for (const [x, by] of [[11, 1], [26, -1]] as const) {
+    // The middle floor's two belts carry you toward each other, at 5 tiles a second, and the tile where they meet holds still.
+    for (const [x, by] of [[13, 1], [26, -1], [18.1, 0]] as const) {
       const belt = load(5)
       stand(belt, x, 17)
       step(belt)
@@ -90,9 +90,11 @@ describe('chapter 1', () => {
     const blade = load(5)
     blade.tiles[24 * blade.w + 1] = 1
     stand(blade, 1.1, 24)
+    const start = blade.blades.find(b => b.x === 1)
+    if (start === undefined) throw new Error('no blade over the start')
     let f = 0
     while (f < 120 && !step(blade).includes('death')) f++
-    expect(f).toBeGreaterThanOrEqual(BLADE_UP)
+    expect(f).toBeGreaterThanOrEqual((start.up - start.phase + BLADE_CYCLE) % BLADE_CYCLE)
     expect(f).toBeLessThan(BLADE_CYCLE)
     expect(blade.deaths).toBe(1)
     for (const lift of [false, true]) {
@@ -106,6 +108,21 @@ describe('chapter 1', () => {
       expect(g.ride).toBe(g.platforms.indexOf(p))
       expect(Math.round((lift ? y - g.py : g.px - x) * 100) / 100).toBe(0.8)
     }
+  })
+
+  test('falling onto spikes impales you where you land: no burst, and the spikes run red', () => {
+    // 1-4's floor of spikes, under its first gap.
+    const g = load(3)
+    g.px = 5.1
+    g.py = 17
+    const events: GameEvent[] = []
+    for (let f = 0; f < 60 && !events.includes('death'); f++) events.push(...step(g))
+    expect(events).toContain('death')
+    expect(g.impaled).toBe(true)
+    expect(g.particles).toHaveLength(0)
+    expect(g.smear[20 * g.w + 5]).toBe(3)
+    for (let f = 0; f < 30; f++) step(g)
+    expect(g.impaled).toBe(false)
   })
 
   test("steel can't be clung to or kicked off, and ground can", () => {

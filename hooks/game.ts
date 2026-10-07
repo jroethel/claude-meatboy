@@ -27,11 +27,12 @@ const SAW_SPEED = 5
 const BELT = 5
 const PLATFORM_SPEED = 4
 // A guillotine's cycle in frames: hanging up, dropping, down on the floor, rising. It is down most of the time.
-export const BLADE_UP = 19
+// A blade marked by a letter rather than a digit hangs up BLADE_LONG frames instead, and is down for less.
+export const BLADE_UP = 51
+export const BLADE_LONG = 59
 const BLADE_DROP = 3
-const BLADE_DOWN = 33
 const BLADE_RISE = 5
-export const BLADE_CYCLE = BLADE_UP + BLADE_DROP + BLADE_DOWN + BLADE_RISE
+export const BLADE_CYCLE = 80
 // How far a raised blade hangs below its ceiling.
 const BLADE_HANG = 0.4
 export const SAW_R = 0.5
@@ -53,6 +54,8 @@ export const BELT_RIGHT = 4
 export const STEEL = 5
 // Ground marked in gold: a ledge on the fastest route. It plays as ground.
 export const MARKED = 6
+// Spikes: not solid; touching their points impales you.
+export const SPIKES = 7
 
 // `jump` is a held jump (Space, or the mouse until `release`); `hop` is a jump let go at once.
 export type Input = { left?: boolean; right?: boolean; jump?: boolean; hop?: boolean; release?: boolean; stop?: boolean }
@@ -63,8 +66,9 @@ export const unpack = (mask: number): Input => Object.fromEntries(INPUT_BITS.fil
 export type GameEvent = 'jump' | 'walljump' | 'death' | 'clear' | 'kidnap'
 export type Phase = 'play' | 'dead' | 'kidnap' | 'replay'
 export type Saw = { x0: number; y0: number; vx0: number; vy0: number; x: number; y: number; vx: number; vy: number; bloody: boolean }
-// A blade hangs in column `x` from row `top`, drops to the floor at `floor`, and runs `phase` frames ahead of the level clock.
-export type Blade = { x: number; top: number; floor: number; phase: number }
+// A blade hangs in column `x` from row `top`, drops to the floor at `floor`, runs `phase` frames ahead of the level clock,
+// and hangs up for `up` frames of each cycle.
+export type Blade = { x: number; top: number; floor: number; phase: number; up: number }
 // A platform `w` tiles wide that you can jump up through and stand on, riding to and fro along its track:
 // its x (or y, for a lift) runs from `lo` to `hi`.
 export type Platform = { lift: boolean; w: number; lo: number; hi: number; x0: number; y0: number; v0: number; x: number; y: number; v: number }
@@ -104,6 +108,8 @@ export type Game = {
   coyote: number
   buffer: number
   phase: Phase
+  // Killed by spikes: he stays on them rather than bursting.
+  impaled: boolean
   deadT: number
   particles: Particle[]
   deaths: number
@@ -138,10 +144,13 @@ export function load(level: number): Game {
       else if (c === '>') tiles[y * w + x] = BELT_RIGHT
       else if (c === '|') tiles[y * w + x] = STEEL
       else if (c === '*') tiles[y * w + x] = MARKED
-      else if (c !== undefined && c >= '0' && c <= '9') {
+      else if (c === 'A') tiles[y * w + x] = SPIKES
+      else if (c !== undefined && ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'j'))) {
         let floor = y + 1
         while (floor < h && !'#=<>|*'.includes(def.rows[floor]?.[x] ?? '#')) floor++
-        blades.push({ x, top: y, floor, phase: (Number(c) * BLADE_CYCLE) / 10 })
+        const long = c >= 'a'
+        const tenths = long ? c.charCodeAt(0) - 97 : Number(c)
+        blades.push({ x, top: y, floor, phase: (tenths * BLADE_CYCLE) / 10, up: long ? BLADE_LONG : BLADE_UP })
       } else if ((c === '~' || c === '^') && row[x - 1] !== c) {
         // A run of ~ slides along the - beside it; a run of ^ lifts along the : above and below its first tile.
         let width = 1
@@ -194,6 +203,7 @@ export function load(level: number): Game {
     coyote: 0,
     buffer: 0,
     phase: 'play',
+    impaled: false,
     deadT: 0,
     particles: [],
     deaths: 0,
@@ -214,7 +224,7 @@ export function isSolid(g: Game, tx: number, ty: number): boolean {
   if (ty >= g.h) return false
   const i = ty * g.w + tx
   const t = g.tiles[i]
-  return t !== EMPTY && (t !== CRUMBLE || g.broken[i] === 0)
+  return t !== EMPTY && t !== SPIKES && (t !== CRUMBLE || g.broken[i] === 0)
 }
 
 // The platform under the player's feet, or -1.
@@ -233,12 +243,13 @@ function beltUnder(g: Game): number {
 export function bladeTip(g: Game, b: Blade): number {
   const up = b.top + BLADE_HANG
   let f = (g.beat + b.phase) % BLADE_CYCLE
-  if (f < BLADE_UP) return up
-  f -= BLADE_UP
+  if (f < b.up) return up
+  f -= b.up
   if (f < BLADE_DROP) return up + ((b.floor - up) * (f + 1)) / BLADE_DROP
   f -= BLADE_DROP
-  if (f < BLADE_DOWN) return b.floor
-  f -= BLADE_DOWN
+  const down = BLADE_CYCLE - b.up - BLADE_DROP - BLADE_RISE
+  if (f < down) return b.floor
+  f -= down
   return b.floor - ((b.floor - up) * (f + 1)) / BLADE_RISE
 }
 
@@ -328,6 +339,18 @@ function touchesSaw(g: Game): Saw | undefined {
   })
 }
 
+// The spike tiles whose points the player is touching: the lower part of the tile, inside its edges.
+function spikesTouched(g: Game): number[] {
+  const hit: number[] = []
+  for (let ty = Math.floor(g.py); ty <= Math.floor(g.py + PH); ty++) {
+    for (let tx = Math.floor(g.px); tx <= Math.floor(g.px + PW); tx++) {
+      if (tx < 0 || ty < 0 || tx >= g.w || ty >= g.h || g.tiles[ty * g.w + tx] !== SPIKES) continue
+      if (g.px < tx + 0.9 && g.px + PW > tx + 0.1 && g.py + PH > ty + 0.4) hit.push(ty * g.w + tx)
+    }
+  }
+  return hit
+}
+
 function touchesGoal(g: Game): boolean {
   return g.px < g.goal.x + 1 && g.px + PW > g.goal.x && g.py < g.goal.y + 1 && g.py + PH > g.goal.y
 }
@@ -361,13 +384,22 @@ function moveParticles(g: Game): void {
   }
 }
 
-function die(g: Game, events: GameEvent[]): void {
+function die(g: Game, events: GameEvent[], spikes: number[] = []): void {
   g.phase = 'dead'
   g.deadT = DEAD_TIME
   g.deaths += 1
   if (g.attempts.length < MAX_ATTEMPTS) g.attempts.push({ path: g.current, died: true })
   g.current = []
   g.keys = []
+  events.push('death')
+  // On spikes he stays put, and they run red.
+  g.impaled = spikes.length > 0
+  // The spikes and the ground under them.
+  for (const i of spikes) {
+    g.smear[i] = 3
+    if (i + g.w < g.smear.length) smearAt(g, i % g.w, Math.floor(i / g.w) + 1, 3)
+  }
+  if (g.impaled) return
   const cx = g.px + PW / 2
   const cy = g.py + PH / 2
   for (let i = 0; i < 18; i++) {
@@ -376,7 +408,6 @@ function die(g: Game, events: GameEvent[]): void {
     g.particles.push({ x: cx, y: cy, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 6, stuck: false })
   }
   if (g.particles.length > MAX_PARTICLES) g.particles.splice(0, g.particles.length - MAX_PARTICLES)
-  events.push('death')
 }
 
 function respawn(g: Game): void {
@@ -390,6 +421,7 @@ function respawn(g: Game): void {
   g.coyote = 0
   g.buffer = 0
   g.phase = 'play'
+  g.impaled = false
   g.crumbleT.fill(-1)
   g.crumbling = []
   g.broken.fill(0)
@@ -501,9 +533,10 @@ export function step(g: Game, input: Input = {}): GameEvent[] {
     }
     probe(g)
     const saw = touchesSaw(g)
-    if (saw !== undefined || touchesBlade(g) || g.py > g.h + 1) {
+    const spikes = spikesTouched(g)
+    if (saw !== undefined || spikes.length > 0 || touchesBlade(g) || g.py > g.h + 1) {
       if (saw !== undefined) saw.bloody = true
-      die(g, events)
+      die(g, events, saw === undefined ? spikes : [])
       return events
     }
     if (touchesGoal(g)) {

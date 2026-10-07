@@ -3,7 +3,7 @@
 
 import type { ClientElements, ClientKeyEvent, ClientModule, RenderElement } from 'claude-code'
 
-import { BELT_LEFT, BELT_RIGHT, BLADE_CYCLE, BLADE_UP, DT, GRAB_FRAME, PH, PW, CRUMBLE, MARKED, SOLID, STEEL as STEEL_TILE, bladeTip, clearMs, grade, load, step, type Game, type GameEvent, type Input } from './game'
+import { BELT_LEFT, BELT_RIGHT, BLADE_CYCLE, DT, GRAB_FRAME, PH, PW, CRUMBLE, MARKED, SOLID, SPIKES, STEEL as STEEL_TILE, bladeTip, clearMs, grade, load, step, type Game, type GameEvent, type Input } from './game'
 import { LEVELS, MAP_ROWS, levelKey } from './levels'
 import { ART, ART_ARM, ART_HAPPY, BANDAGE_ART, BANDAGE_HAPPY, BANDAGE_PALETTE, CLAUDE, FETUS, FETUS_PALETTE, PALETTE, step2 } from './sprite'
 
@@ -42,7 +42,8 @@ export type State = {
 export const PANE_ROWS = MAP_ROWS + 2
 const MIN_ROWS = 8
 const TITLE_FRAMES = 40
-const SAW_FRAMES = ['◐◑', '◓◒', '◑◐', '◒◓']
+// Toothed blades, their teeth flickering as they spin.
+const SAW_FRAMES = ['✹✹', '✺✺']
 
 const SKY_TOP = 0x1b1030
 const SKY_LOW = 0xb4553a
@@ -63,6 +64,7 @@ const STEEL = 0x6b7080
 const PLATE = 0x8d96a8
 const PLATE_EDGE = 0xd5dce8
 const RIVET = 0x4c5466
+const SPIKE = 0xd5dce8
 const BLADE = 0xdfe5ee
 const WARN = 0xff5a4a
 const PLANK = 0xd9a441
@@ -147,6 +149,9 @@ function paintWorld(c: Canvas, s: State, camX: number): void {
           if (isTop) c.set(sx + d, ty, '▀', PLATE_EDGE, bg)
           else c.set(sx + d, ty, d === 0 && ty % 2 === 0 ? '•' : ' ', RIVET, bg)
         }
+      } else if (tile === SPIKES) {
+        // Steel points over the sky; a red streak once someone is on them.
+        for (let d = 0; d < 2; d++) c.set(sx + d, ty, '▲', smear > 0 ? MEAT : SPIKE)
       } else if (tile === BELT_LEFT || tile === BELT_RIGHT) {
         // Chevrons that run the way the belt carries, a cell every 3 frames: 5 tiles a second.
         const dir = tile === BELT_RIGHT ? 1 : -1
@@ -195,7 +200,7 @@ function paintActors(c: Canvas, s: State, camX: number): void {
     const x = col(b.x)
     const tip = Math.floor(bladeTip(g, b) - 1e-3)
     const f = (g.beat + b.phase) % BLADE_CYCLE
-    const warn = f >= BLADE_UP - 8 && f < BLADE_UP && g.beat % 2 === 0
+    const warn = f >= b.up - 8 && f < b.up && g.beat % 2 === 0
     for (let y = b.top; y < tip; y++) {
       c.set(x, y, '▐', STEEL)
       c.set(x + 1, y, '▌', STEEL)
@@ -205,11 +210,11 @@ function paintActors(c: Canvas, s: State, camX: number): void {
   }
   for (const p of g.particles) c.set(col(p.x), Math.floor(p.y), p.stuck ? '▪' : '•', p.stuck ? BLOOD : MEAT)
   for (const saw of g.saws) {
-    const glyphs = SAW_FRAMES[(t >> 1) % SAW_FRAMES.length] ?? '◐◑'
+    const glyphs = SAW_FRAMES[(t >> 1) % SAW_FRAMES.length] ?? '✹✹'
     const x = col(saw.x - 0.5)
     const y = Math.floor(saw.y)
-    c.set(x, y, glyphs[0] ?? '◐', saw.bloody ? 0xff4040 : 0xe8e8e8)
-    c.set(x + 1, y, glyphs[1] ?? '◑', saw.bloody ? 0xff4040 : 0xe8e8e8)
+    c.set(x, y, glyphs[0] ?? '✹', saw.bloody ? 0xff4040 : 0xe8e8e8)
+    c.set(x + 1, y, glyphs[1] ?? '✹', saw.bloody ? 0xff4040 : 0xe8e8e8)
   }
 
   if (g.phase === 'play' || g.phase === 'kidnap') {
@@ -218,6 +223,13 @@ function paintActors(c: Canvas, s: State, camX: number): void {
     // Clawd's black eye, on the side he faces.
     c.set(x, y, g.facing === 1 ? ' ' : '•', 0x000000, CLAUDE)
     c.set(x + 1, y, g.facing === 1 ? '•' : ' ', 0x000000, CLAUDE)
+  }
+  if (g.phase === 'dead' && g.impaled) {
+    // Sunk onto the spikes, a point through him.
+    const x = col(g.px + PW / 2 - 0.5)
+    const y = Math.floor(g.py + PH)
+    c.set(x, y, '▲', SPIKE, mix(CLAUDE, MEAT, 0.35))
+    c.set(x + 1, y, '▲', SPIKE, mix(CLAUDE, MEAT, 0.35))
   }
   if (g.phase === 'replay') {
     // Every attempt at once, as the game shows it after a clear: the dead ones burst at their saw.
