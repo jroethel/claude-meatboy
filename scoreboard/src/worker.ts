@@ -32,6 +32,11 @@ const CLAWD_SVG = pixels(step2(ART), PALETTE)
 // Square for the browser tab: Clawd's 18 x 12 with 3 clear rows above and below.
 const ICON = `data:image/svg+xml,${encodeURIComponent(pixels(ART, PALETTE, 3))}`
 
+// The X and GitHub marks, from simple-icons.
+const X_PATH = 'M14.234 10.162 22.977 0h-2.072l-7.591 8.824L7.251 0H.258l9.168 13.343L.258 24H2.33l8.016-9.318L16.749 24h6.993zm-2.837 3.299-.929-1.329L3.076 1.56h3.182l5.965 8.532.929 1.329 7.754 11.09h-3.182z'
+const GITHUB_PATH = 'M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12'
+const mark = (href: string, label: string, d: string) => `<a href="${href}" aria-label="${label}"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="${d}"/></svg></a>`
+
 // Handles need no escaping: verify admits only letters, digits and underscores.
 function page(rows: Row[]): string {
   const body = rows.length === 0
@@ -42,7 +47,9 @@ function page(rows: Row[]): string {
 body{margin:0;min-height:100vh;background:linear-gradient(#1b1030,#b4553a);color:#f3e9dc;font:16px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;display:flex;justify-content:center}
 main{padding:48px 20px;width:min(520px,100%);box-sizing:border-box}h1{color:#d77757;font-size:28px;margin:0 0 16px}h1 img{display:block;width:100%;height:auto;border-radius:6px}
 .sub{margin:0 0 28px;opacity:.85}table{border-collapse:collapse;width:100%}td{padding:6px 10px;border-bottom:1px solid #f3e9dc33}
-td:nth-child(3),td:nth-child(4){text-align:right;white-space:pre}tr:first-child td{color:#ffd23f}a{color:#ff7aa8}
+tr:last-child td{border-bottom:0}td:nth-child(3),td:nth-child(4){text-align:right;white-space:pre}
+.board{border:2px solid #f3e9dc55;border-radius:8px;padding:8px 10px}.board p{margin:8px 0}
+.marks{display:flex;justify-content:center;gap:24px;margin-top:20px}.marks a{color:#f3e9dc;opacity:.85}.marks a:hover{opacity:1}.marks svg{display:block;width:28px;height:28px}tr:first-child td{color:#ffd23f}a{color:#ff7aa8}
 @media (max-width:480px){td{padding:6px 5px}.sub{font-size:14px}}@media (max-width:360px){table{font-size:14px}}
 main{position:relative}.stage{--px:6px}.scene{position:absolute;top:340px;width:calc(36*var(--px));height:calc(40*var(--px))}
 .scene div{position:absolute}.scene svg{display:block;width:100%}.left{left:calc(-36*var(--px) - 40px)}.right{right:calc(-36*var(--px) - 40px)}
@@ -61,7 +68,8 @@ main{position:relative}.stage{--px:6px}.scene{position:absolute;top:340px;width:
 </style></head><body><main><h1><img src="https://raw.githubusercontent.com/jroethel/claude-meatboy/main/header.svg" alt="Claude Meatboy" width="1032" height="352"></h1><p class="sub">Global leaderboard.<br>Every run is replayed before it counts.<br><a href="https://github.com/jroethel/claude-meatboy">Play it in Claude Code</a><br><a href="https://raw.githubusercontent.com/jroethel/claude-meatboy/main/screenshot.png">See it being played</a></p>
 <div class="stage" aria-hidden="true"><div class="scene left"><div class="dash" style="left:calc(4*var(--px));width:calc(8*var(--px));bottom:calc(12*var(--px));opacity:.7"></div><div class="dash" style="left:calc(1*var(--px));width:calc(10*var(--px));bottom:calc(9*var(--px));opacity:.45"></div><div class="dash" style="left:calc(6*var(--px));width:calc(6*var(--px));bottom:calc(6*var(--px));opacity:.6"></div><div class="clawd">${CLAWD_SVG}</div><div class="floor"></div></div>
 <div class="scene right"><div class="kidnap"><div class="fetus">${pixels(FETUS, FETUS_PALETTE)}</div><div class="rope"></div><div class="girl">${pixels(BANDAGE_ART, BANDAGE_PALETTE)}</div><div class="help">help!</div></div></div></div>
-${body}</main></body></html>`
+<div class="board">${body}</div>
+<nav class="marks">${mark('https://x.com/jeremyroethel', 'Jeremy Roethel on X', X_PATH)}${mark('https://github.com/jroethel', 'Jeremy Roethel on GitHub', GITHUB_PATH)}</nav></main></body></html>`
 }
 
 export default {
