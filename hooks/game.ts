@@ -26,13 +26,13 @@ const SAW_SPEED = 5
 // A belt carries what stands on it at this speed; running against it, you make RUN - BELT.
 const BELT = 5
 const PLATFORM_SPEED = 4
-// A guillotine's cycle in frames: hanging up, dropping, down on the floor, rising. It is down most of the time.
+// A guillotine's cycle in frames: hanging up, dropping, down on the floor, rising. It is up most of the time.
 // A blade marked by a letter rather than a digit hangs up BLADE_LONG frames instead, and is down for less.
-export const BLADE_UP = 51
+export const BLADE_UP = 42
 export const BLADE_LONG = 59
 const BLADE_DROP = 3
 const BLADE_RISE = 5
-export const BLADE_CYCLE = 80
+export const BLADE_CYCLE = 70
 // How far a raised blade hangs below its ceiling.
 const BLADE_HANG = 0.4
 export const SAW_R = 0.5
