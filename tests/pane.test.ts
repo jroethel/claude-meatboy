@@ -257,7 +257,7 @@ async function clearLevel(ui: Ui, n: number): Promise<void> {
   await ui.advance(33)
 }
 
-test('a run from 1-1 to the end asks for an X handle and puts it on the board, here and in the world', { timeoutMs: 60_000 }, async ($, on) => {
+test('a run from 1-1 to the end asks for a handle and puts it on the board, here and in the world', { timeoutMs: 60_000 }, async ($, on) => {
   mock.store(on)
   paneOpen(on)
   on('audio.play', () => ({ value: undefined }))
@@ -276,9 +276,9 @@ test('a run from 1-1 to the end asks for an X handle and puts it on the board, h
   // The hug plays first, then ends on its own.
   await ui.advance(33 * 60)
   expect(await ui.find({ in: 'game', text: /TOGETHER AGAIN/ })).toBeDefined()
-  expect(await ui.find({ in: 'game', text: /YOUR X HANDLE/ })).toBeUndefined()
+  expect(await ui.find({ in: 'game', text: /@handle/ })).toBeUndefined()
   await ui.advance(33 * 65)
-  expect(await ui.find({ in: 'game', text: /FOR THE BOARD, YOUR X HANDLE/ })).toBeDefined()
+  expect(await ui.find({ in: 'game', text: /@handle/ })).toBeDefined()
   // Shift capitalizes, symbols other than _ are refused, and the handle stops at X's 15 characters.
   await ui.key({ key: 'j', shift: true })
   for (const key of ['r', 'backspace', 'q', '-', '@', 'x', '_', '9', ...'abcdefghijk']) await ui.key({ key })
@@ -316,7 +316,7 @@ test('a practice run to the end gets no handle prompt and no board', { timeoutMs
   await ui.key({ key: 'return' })
   await ui.advance(33)
   expect(await ui.find({ in: 'game', text: /YOU SAVED BANDAGE GIRL/ })).toBeDefined()
-  expect(await ui.find({ in: 'game', text: /YOUR X HANDLE/ })).toBeUndefined()
+  expect(await ui.find({ in: 'game', text: /@handle/ })).toBeUndefined()
   expect(await ui.find({ in: 'game', text: /practice run: times not saved/ })).toBeDefined()
   await ui.unmount()
 })

@@ -447,7 +447,7 @@ function endScreen(c: Canvas, s: State, board: Score[]): void {
   c.center(5 + s.results.length, `total ${seconds(sum.ms)}   deaths ${sum.deaths}`, GOLD, INK)
   if (s.handle !== undefined) {
     const cursor = s.handle.length < HANDLE_MAX && s.frame % 20 < 10 ? '▌' : ''
-    c.center(7 + s.results.length, `  FOR THE BOARD, YOUR X HANDLE:  ${`@${s.handle}${cursor}`.padEnd(HANDLE_MAX + 1)}  `, INK, GOLD)
+    c.center(7 + s.results.length, `  ${`@${s.handle || 'handle'}${cursor}`.padEnd(HANDLE_MAX + 1)}  `, INK, GOLD)
     c.center(9 + s.results.length, `up to ${HANDLE_MAX} letters, digits or _  ·  Backspace fixes  ·  Enter saves`, 0xb8a0b8, INK)
     return
   }
