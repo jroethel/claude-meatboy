@@ -19,6 +19,7 @@ Finish a run and it goes on a world scoreboard under your @handle. How fast can 
 ## Requirements
 
 - Claude Code in a terminal.
+  The desktop app doesn't work yet: its code font lacks the block characters the game draws with, so the map doesn't line up.
 - **Sound and music play on macOS only.** On Windows and Linux the game runs silently.
 - A network connection to post runs to the world board. Offline, runs stay on your machine's board.
 
