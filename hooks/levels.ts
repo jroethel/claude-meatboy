@@ -133,7 +133,7 @@ export const LEVELS: LevelDef[] = [
     '    #                       ^^',
     '    #AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     '    ##################################',
-    '   H#   6  5  4     3  2  1',
+    '   H#   2  3  4     3  2  1',
     '    #',
     '',
     '',
