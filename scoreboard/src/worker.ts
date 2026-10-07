@@ -46,7 +46,7 @@ function page(rows: Row[]): string {
 <title>Claude Meatboy: global leaderboard</title><link rel="icon" href="${ICON}"><style>
 body{margin:0;min-height:100vh;background:linear-gradient(#1b1030,#b4553a);color:#f3e9dc;font:16px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;display:flex;justify-content:center}
 main{padding:48px 20px;width:min(520px,100%);box-sizing:border-box}h1{color:#d77757;font-size:28px;margin:0 0 16px}h1 img{display:block;width:100%;height:auto;border-radius:6px}
-.sub{margin:0 0 28px;opacity:.85}table{border-collapse:collapse;width:100%}td{padding:6px 10px;border-bottom:1px solid #f3e9dc33}
+.sub{margin:0 0 28px;opacity:.85;text-align:center}.sub small{font-size:13px;opacity:.75}table{border-collapse:collapse;width:100%}td{padding:6px 10px;border-bottom:1px solid #f3e9dc33}
 tr:last-child td{border-bottom:0}td:nth-child(3),td:nth-child(4){text-align:right;white-space:pre}
 .board{border:2px solid #f3e9dc55;border-radius:8px;padding:8px 10px}.board p{margin:8px 0}
 .marks{display:flex;justify-content:center;gap:24px;margin-top:20px}.marks a{color:#f3e9dc;opacity:.85}.marks a:hover{opacity:1}.marks svg{display:block;width:14px;height:14px}tr:first-child td{color:#ffd23f}a{color:#ff7aa8}
@@ -65,7 +65,7 @@ main{position:relative}.stage{--px:6px}.scene{position:absolute;top:340px;width:
 @keyframes swing{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
 @media (max-width:1120px){.stage{--px:4px;position:relative;height:calc(40*var(--px));margin:0 0 24px}.left{left:0}.right{right:0}.scene{top:0}}
 @media (prefers-reduced-motion:reduce){.stage *{animation:none!important}}
-</style></head><body><main><h1><img src="https://raw.githubusercontent.com/jroethel/claude-meatboy/main/header.svg" alt="Claude Meatboy" width="1032" height="352"></h1><p class="sub">Global leaderboard.<br>Every run is replayed before it counts.<br><a href="https://github.com/jroethel/claude-meatboy">Play it in Claude Code</a><br><a href="https://raw.githubusercontent.com/jroethel/claude-meatboy/main/screenshot.png">See it being played</a></p>
+</style></head><body><main><h1><img src="https://raw.githubusercontent.com/jroethel/claude-meatboy/main/header.svg" alt="Claude Meatboy" width="1032" height="352"></h1><p class="sub">Global Leaderboard<br><small>(all runs are validated)</small><br><a href="https://github.com/jroethel/claude-meatboy">Play it - Get the Mod</a><br><a href="https://raw.githubusercontent.com/jroethel/claude-meatboy/main/screenshot.png">Screenshot</a></p>
 <div class="stage" aria-hidden="true"><div class="scene left"><div class="dash" style="left:calc(4*var(--px));width:calc(8*var(--px));bottom:calc(12*var(--px));opacity:.7"></div><div class="dash" style="left:calc(1*var(--px));width:calc(10*var(--px));bottom:calc(9*var(--px));opacity:.45"></div><div class="dash" style="left:calc(6*var(--px));width:calc(6*var(--px));bottom:calc(6*var(--px));opacity:.6"></div><div class="clawd">${CLAWD_SVG}</div><div class="floor"></div></div>
 <div class="scene right"><div class="kidnap"><div class="fetus">${pixels(FETUS, FETUS_PALETTE)}</div><div class="rope"></div><div class="girl">${pixels(BANDAGE_ART, BANDAGE_PALETTE)}</div><div class="help">help!</div></div></div></div>
 <div class="board">${body}</div>
