@@ -49,7 +49,7 @@ main{padding:48px 20px;width:min(520px,100%);box-sizing:border-box}h1{color:#d77
 .sub{margin:0 0 28px;opacity:.85}table{border-collapse:collapse;width:100%}td{padding:6px 10px;border-bottom:1px solid #f3e9dc33}
 tr:last-child td{border-bottom:0}td:nth-child(3),td:nth-child(4){text-align:right;white-space:pre}
 .board{border:2px solid #f3e9dc55;border-radius:8px;padding:8px 10px}.board p{margin:8px 0}
-.marks{display:flex;justify-content:center;gap:24px;margin-top:20px}.marks a{color:#f3e9dc;opacity:.85}.marks a:hover{opacity:1}.marks svg{display:block;width:28px;height:28px}tr:first-child td{color:#ffd23f}a{color:#ff7aa8}
+.marks{display:flex;justify-content:center;gap:24px;margin-top:20px}.marks a{color:#f3e9dc;opacity:.85}.marks a:hover{opacity:1}.marks svg{display:block;width:14px;height:14px}tr:first-child td{color:#ffd23f}a{color:#ff7aa8}
 @media (max-width:480px){td{padding:6px 5px}.sub{font-size:14px}}@media (max-width:360px){table{font-size:14px}}
 main{position:relative}.stage{--px:6px}.scene{position:absolute;top:340px;width:calc(36*var(--px));height:calc(40*var(--px))}
 .scene div{position:absolute}.scene svg{display:block;width:100%}.left{left:calc(-36*var(--px) - 40px)}.right{right:calc(-36*var(--px) - 40px)}
