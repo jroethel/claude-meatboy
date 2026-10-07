@@ -51,10 +51,11 @@ Jump while sliding down a wall to wall-jump.
 Practice runs show PRACTICE in place of the timer and save nothing.
 
 `/meatboy scores` prints the world top ten, `/meatboy music a`, `b` or `off` picks a soundtrack, and `/meatboy mute` silences everything.
+Sound and music play on macOS only.
 
 ## The world board
 
-A run from 1-1 through 1-6 in order, outside practice, ends by asking for your X handle, up to 15 letters, digits or underscores.
+A run from 1-1 through 1-6 in order, outside practice, ends by asking for your @handle, up to 15 letters, digits or underscores.
 The game sends the handle, the time, the death count and each level's winning inputs to a Cloudflare Worker.
 The Worker replays every level on the game's own physics and stores the time the replay gives, so a run can't be faked by editing its time.
 Deaths are taken as sent and only break ties.
@@ -85,4 +86,4 @@ Clawd is the mascot from Claude Code's banner, not affiliated with or endorsed b
 
 ## Screenshot
 
-<img src="screenshot.png" width="100%" alt="Claude Code with Claude Meatboy in a side pane: 1-3 Buzzsaw Boulevard after four deaths, Clawd in mid-air over a bloody saw">
+<img src="screenshot.png" width="100%" alt="Claude Code with Claude Meatboy in a side pane: 1-5 Chutes and Ladders at 6.00s, Clawd in mid-air between the saws of the ladder chute">
