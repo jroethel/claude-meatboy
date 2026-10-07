@@ -120,7 +120,7 @@ export const LEVELS: LevelDef[] = [
     '|     |##                   |###S    S',
     '|  P  |#                    ####  B',
   ]),
-  frame('Fetus Fury', 16000, [
+  frame('Fetus Fury', 16300, [
     '',
     '                                     B',
     '                            :  |>>>>>>',
@@ -128,8 +128,8 @@ export const LEVELS: LevelDef[] = [
     '    #                       :',
     '    #                       :',
     '    #             ~~~------ :',
-    '    #      S   S            :',
-    '    #      S###S            :',
+    '    #      S  S             :',
+    '    #      S##S             :',
     '    #                       ^^',
     'H   #AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     '    ##################################',
