@@ -127,7 +127,7 @@ describe('chapter 1', () => {
 
   test("steel can't be clung to or kicked off, and ground can", () => {
     // Falling beside 1-5's climb: its outer wall is steel, the column across from it is ground.
-    for (const [x, steel] of [[2 + 1e-4, true], [6 - PW - 1e-4, false]] as const) {
+    for (const [x, steel] of [[2 + 1e-4, true], [7 - PW - 1e-4, false]] as const) {
       const g = load(4)
       g.px = x
       g.py = 10
