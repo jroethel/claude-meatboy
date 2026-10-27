@@ -1,0 +1,88 @@
+{
+ "_license_note": "Images are manufacturer-supplied vehicle photography (evox media / KBB house shots) republished by Kelley Blue Book. Copyright remains with the manufacturer/photographer; used here for private comparison research only. Source URLs recorded per file.",
+ "_fetched_at": "2026-10-27T11:06:23-0400",
+ "honda-pilot-hero.jpg": {
+  "source": "https://file.kelleybluebookimages.com/kbb/base/evox/StJ/52950/2023-Honda-Pilot-front-angle1_52950_046_640x480.jpg",
+  "description": "2023 Honda Pilot, front 3/4 exterior (manufacturer evox photography via KBB)",
+  "http": 200,
+  "bytes": 153873,
+  "ok": true
+ },
+ "mazda-cx-9-hero.jpg": {
+  "source": "https://file.kelleybluebookimages.com/kbb/base/evox/StJ/53171/2023-MAZDA-CX-9-front-angle1_53171_046_640x480.jpg",
+  "description": "2023 Mazda CX-9, front 3/4 exterior (manufacturer evox photography via KBB)",
+  "http": 200,
+  "bytes": 139585,
+  "ok": true
+ },
+ "mazda-cx-9-interior.jpg": {
+  "source": "https://file.kelleybluebookimages.com/kbb/base/evox/StJ/53171/2023-MAZDA-CX-9-dashboard_53171_059_640x480.jpg",
+  "description": "2023 Mazda CX-9, dashboard (manufacturer evox photography via KBB)",
+  "http": 200,
+  "bytes": 201309,
+  "ok": true
+ },
+ "mazda-cx-9-wheel.jpg": {
+  "source": "https://file.kelleybluebookimages.com/kbb/base/evox/StJ/53171/2023-MAZDA-CX-9-wheel_53171_042_640x480.jpg",
+  "description": "2023 Mazda CX-9, wheel closeup (manufacturer evox photography via KBB)",
+  "http": 200,
+  "bytes": 179798,
+  "ok": true
+ },
+ "mazda-cx-90-hero.jpg": {
+  "source": "https://www.mazdausa.com/adobe/dynamicmedia/deliver/dm-aid--f424b2da-ef90-4ef6-b813-2379bb527146/01-hero-desktop.jpg",
+  "description": "2024-25 Mazda CX-90, official mazdausa.com hero image",
+  "http": 200,
+  "bytes": 225078,
+  "ok": true
+ },
+ "gmc-acadia-hero.jpg": {
+  "source": "https://file.kelleybluebookimages.com/kbb/base/evox/StJ/54849/2024-GMC-Acadia-front-angle1_54849_046_640x480.jpg",
+  "description": "2024 GMC Acadia, front 3/4 exterior (manufacturer evox photography via KBB)",
+  "http": 200,
+  "bytes": 139701,
+  "ok": true
+ },
+ "gmc-acadia-interior.jpg": {
+  "source": "https://file.kelleybluebookimages.com/kbb/base/evox/StJ/54849/2024-GMC-Acadia-dashboard_54849_059_640x480.jpg",
+  "description": "2024 GMC Acadia, dashboard (manufacturer evox photography via KBB)",
+  "http": 200,
+  "bytes": 177395,
+  "ok": true
+ },
+ "honda-pilot-interior.jpg": {
+  "source": "https://file.kelleybluebookimages.com/kbb/base/evox/StJ/52950/2023-Honda-Pilot-dashboard_52950_059_640x480.jpg",
+  "description": "2023 Honda Pilot, dashboard (manufacturer evox photography via KBB)",
+  "bytes": 173977,
+  "ok": true,
+  "note": "credit backfilled; http 200 observed at download time"
+ },
+ "mazda-cx-90-interior.jpg": {
+  "source": "https://file.kelleybluebookimages.com/kbb/base/evox/StJ/53044/2024-MAZDA-CX-90-dashboard_53044_059_640x480.jpg",
+  "description": "2024 Mazda CX-90, dashboard (manufacturer evox photography via KBB)",
+  "bytes": 179030,
+  "ok": true,
+  "note": "credit backfilled; http 200 observed at download time"
+ },
+ "mazda-cx-90-wheel.jpg": {
+  "source": "https://file.kelleybluebookimages.com/kbb/base/evox/StJ/53044/2024-MAZDA-CX-90-wheel_53044_042_640x480.jpg",
+  "description": "2024 Mazda CX-90, wheel closeup (manufacturer evox photography via KBB)",
+  "bytes": 187183,
+  "ok": true,
+  "note": "credit backfilled; http 200 observed at download time"
+ },
+ "hyundai-santa-fe-hybrid-hero.jpg": {
+  "source": "https://file.kelleybluebookimages.com/kbb/base/house/2024/2024-Hyundai-Santa%20Fe%20Hybrid-Front_HYSAFE2404_640x480.jpg",
+  "description": "2024 Hyundai Santa Fe Hybrid, front exterior (KBB house photography)",
+  "bytes": 34944,
+  "ok": true,
+  "note": "credit backfilled; http 200 observed at download time"
+ },
+ "hyundai-santa-fe-hybrid-interior.jpg": {
+  "source": "https://file.kelleybluebookimages.com/kbb/base/house/2024/2024-Hyundai-Santa%20Fe%20Hybrid-FrontRowSeats_HYSAFEINT2450_640x480.jpg",
+  "description": "2024 Hyundai Santa Fe Hybrid, front row seats / cabin (KBB house photography)",
+  "bytes": 35956,
+  "ok": true,
+  "note": "credit backfilled; http 200 observed at download time"
+ }
+}
